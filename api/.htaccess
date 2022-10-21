@@ -44,10 +44,10 @@ RewriteRule .* index.php [L]
 ## End - Joomla! core SEF Section.
 
 # Página Error 404
-ErrorDocument 404 /404.php
+#ErrorDocument 404 /404.php
 
 # Página Error 500
-ErrorDocument 500 /500.php
+#ErrorDocument 500 /500.php
 
 #php_flag log_errors On
 #php_value error_log /var/log/httpd/dataprol1/php_error_log_api
