@@ -7,7 +7,7 @@
     // Configurações da instalação no servidor
     require_once('passwords.php');
 
-    // Detecta se está em produção ou teste e faz ajustes
+    // Detecta se está em produção ou teste e faz ajustes//
     if( $_SERVER['SERVER_NAME'] == 'localhost' ){
 
         $cHTTP_SERVER = '/dev/aulas/Monibus_PDS/api';
