@@ -1,7 +1,9 @@
 <?php 
     
 	require_once("config/config.php");
+
 	session_start(); 
+	
 	require_once("controllers/BaseController.php");
 
 	if( ! isset( $_SESSION[ "usuarioErroEsperar" ] ) ){
@@ -92,11 +94,7 @@
 							break;
 
 						case 'PUT':
-							if( ! isset( $uriSegments[2] ) ){
-								$PessoaCTRL -> updatePessoa( null );
-							}else{
-								$PessoaCTRL -> updatePessoa( $uriSegments[2] );
-							}
+							$PessoaCTRL -> updatePessoa( $uriSegments[2] );
 							break;
 
 						case 'DELETE':

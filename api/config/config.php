@@ -10,27 +10,21 @@
     // Detecta se está em produção ou teste e faz ajustes//
     if( $_SERVER['SERVER_NAME'] == 'localhost' ){
 
-        $cHTTP_SERVER = '/dev/aulas/Monibus_PDS/api';
-
-        $activeConfig = 'dev';
-
         $db = $bd_local;
-
+        $activeConfig = 'dev';
+        $cHTTP_SERVER = '/dev/aulas/Monibus_PDS/api';
         ini_set( 'display_errors', 1 );
         ini_set( 'display_startup_errors', 1 );
         error_reporting( E_ALL );
 
     }else{
         
-        $cHTTP_SERVER ='/api';
-
-        $activeConfig = 'prod';
-
         $db = $bd_remoto;
-
+        $activeConfig = 'prod';
+        $cHTTP_SERVER ='/api';
         ini_set( 'display_errors', 0 );
         ini_set( 'display_startup_errors', 0 );
-        error_reporting( E_ERROR );
+        error_reporting( E_ALL ); //E_ERROR após lançamento oficial
 
     }
     

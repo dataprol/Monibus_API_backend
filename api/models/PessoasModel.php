@@ -64,9 +64,9 @@ class PessoasModel{
                     '" . $arraypessoas['nomePessoa'] . "', 
                     '" . $arraypessoas['identidadePessoa'] . "', 
                     '" . $arraypessoas['emailPessoa'] . "', 
-                    '" . $arraypessoas['tipoPessoa'] . "'
-                    '" . $arraypessoas['senhaPessoa'] . "'
-                    '" . $arraypessoas['usuarioPessoa'] . "'
+                    '" . $arraypessoas['tipoPessoa'] . "', 
+                    '" . $arraypessoas['senhaPessoa'] . "', 
+                    '" . $arraypessoas['usuarioPessoa'] . "', 
                     now()
                     );";
 
@@ -76,18 +76,26 @@ class PessoasModel{
     }
 
     public function updatePessoa($arraypessoas){
+
         $sql = "UPDATE pessoas 
-            SET nomePessoa='" . $arraypessoas['nomePessoa'] . "', 
-                emailPessoa='" . $arraypessoas['emailPessoa'] . "', 
-                telefone1Pessoa='" . $arraypessoas['telefone1Pessoa'] . "', 
-                senhaPessoa='" . $arraypessoas['senhaPessoa'] . "' 
-        WHERE idPessoa=" . $arraypessoas['idPessoa'] . ";" ;
+            SET nomePessoa='" . $arraypessoas['nomePessoa'] . "'
+                ,emailPessoa='" . $arraypessoas['emailPessoa'] . "'
+                ,identidadePessoa='" . $arraypessoas['identidadePessoa'] . "'
+                ,usuarioPessoa='" . $arraypessoas['usuarioPessoa'] . "'
+                ,senhaPessoa='" . $arraypessoas['senhaPessoa'] . "'
+                ,tipoPessoa='" . $arraypessoas['tipoPessoa'] . "' 
+            WHERE idPessoa=" . $arraypessoas['idPessoa'] . ";" ;
+
         $this -> resultado = $this -> Conn -> query($sql);
+
     }
 
     public function deletePessoa($idPessoa){
+
         $sql = "DELETE FROM pessoas WHERE idPessoa='" . $idPessoa . "';" ;
+
         $this -> resultado = $this -> Conn-> query($sql);
+        
     }
 
     public function getConsult(){

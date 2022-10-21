@@ -75,39 +75,47 @@ class PessoasController extends BaseController {
 
     }
 
-    public function updatePessoa( $id_pessoa ){
+    public function updatePessoa( $idPessoa ){
 
 		$oPessoa = json_decode(file_get_contents("php://input"));
-
-		if( ! isset( $id_pidPessoaessoa ) ){
+        
+		if( empty( $idPessoa ) ){
 			$idPessoa = $oPessoa -> idPessoa;
 		}
-
-		$this -> Model -> consultPessoa( $idPessoa );
-
-		$arrayPessoas["idPessoa"] = $idPessoa;
-        $arrayPessoas["nomePessoa"] = $oPessoa -> nomePessoa;
-        $arrayPessoas["emailPessoa"] = $oPessoa -> emailPessoa;
-        $arrayPessoas["telefone1Pessoa"] = $oPessoa -> telefone1Pessoa;
-        $arrayPessoas["senhaPessoa"] = $oPessoa -> senhaPessoa;
-
-        $this -> Model -> updatePessoa($arrayPessoas);
-
-        header('Content-Type: application/json');
-        echo('{ "Result": "true" }');
+        
+        if( !empty($idPessoa)){
+            $this -> Model -> consultPessoa( $idPessoa );
+            $arrayPessoas["idPessoa"] = $idPessoa;
+            $arrayPessoas["nomePessoa"] = $oPessoa -> nomePessoa;
+            $arrayPessoas["identidadePessoa"] = $oPessoa -> identidadePessoa;
+            $arrayPessoas["emailPessoa"] = $oPessoa -> emailPessoa;
+            $arrayPessoas["usuarioPessoa"] = $oPessoa -> usuarioPessoa;
+            $arrayPessoas["senhaPessoa"] = $oPessoa -> senhaPessoa;
+            $arrayPessoas["tipoPessoa"] = $oPessoa -> tipoPessoa;
+            $this -> Model -> updatePessoa($arrayPessoas);
+            header('Content-Type: application/json');
+            echo('{ "Result": "true" }');
+        }else{
+            header('Content-Type: application/json');
+            echo('{ "Result": "false" }');
+        }
         
     }
 
     public function deletePessoa( $idPessoa ){
 
-		if( ! isset( $idPessoa ) ){
+		if( empty( $idPessoa ) ){
 			$idPessoa = json_decode(file_get_contents("php://input")) -> idPessoa;
 		}
-
-        $this -> Model -> deletePessoa( $idPessoa );
-
-        header('Content-Type: application/json');
-        echo('{ "Result": "true" }');
+        
+        if( !empty($idPessoa)){
+            $this -> Model -> deletePessoa( $idPessoa );
+            header('Content-Type: application/json');
+            echo('{ "Result": "true" }');
+        }else{
+            header('Content-Type: application/json');
+            echo('{ "Result": "false" }');
+        }    
 
     }
 
