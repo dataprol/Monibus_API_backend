@@ -4,6 +4,9 @@
 									// Cuidado! Dados ficarão gravados por todo esse tempo!
                                     // Risco de sobrecarga e de falha de segurança!
 
+    // Configurações da instalação no servidor
+    require_once('passwords.php');
+
     // Detecta se está em produção ou teste e faz ajustes
     if( $_SERVER['SERVER_NAME'] == 'localhost' ){
 
@@ -11,10 +14,7 @@
 
         $activeConfig = 'dev';
 
-        $db = array('hostname' => 'localhost', 
-                    'username' => 'root',
-                    'password' => 'Xsdzlca#$*494875',
-                    'database' => 'monibus');
+        $db = $bd_local;
 
         ini_set( 'display_errors', 1 );
         ini_set( 'display_startup_errors', 1 );
@@ -26,10 +26,7 @@
 
         $activeConfig = 'prod';
 
-        $db = array('hostname' => 'monibus.tecnologia.ws', 
-                    'username' => '',
-                    'password' => '',
-                    'database' => '');
+        $db = $bd_remoto;
 
         ini_set( 'display_errors', 0 );
         ini_set( 'display_startup_errors', 0 );
