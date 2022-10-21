@@ -1,9 +1,9 @@
 <?php 
     
 	require_once("config/config.php");
-
 	session_start(); 
-	
+	require_once("controllers/BaseController.php");
+
 	if( ! isset( $_SESSION[ "usuarioErroEsperar" ] ) ){
 		$_SESSION["usuarioErroEsperar"] = .1;
 	}
@@ -20,7 +20,7 @@
 	$rout = str_replace($query_str, "", $rout);
 	$rout = str_replace("?", "", $rout);
 	$uriSegments = explode("/", $rout);
-
+    
     if( !isset( $uriSegments[1] ) ){
 
         require_once("controllers/MainController.php");
@@ -49,7 +49,7 @@
 						case 'sd': $Main -> destroySession(); break;
                     }
                 }
-			break;
+            break;
 
             case 'users':
 			
@@ -67,7 +67,47 @@
                     }
                 }
             break;
-			
+
+            case 'pessoas':
+
+				require_once( "controllers/PessoasController.php" );
+				$PessoaCTRL = new PessoasController();
+				if( ! isset( $request_method ) ){
+					$PessoaCTRL -> listThis();
+				}
+				else{
+					switch($request_method)
+					{
+						case 'GET':
+							if( ! isset( $uriSegments[2] ) ){
+								$PessoaCTRL -> listThis();
+							}
+							else{
+								$PessoaCTRL -> consultPessoa( $uriSegments[2] );
+							}
+							break;
+
+						case 'POST':
+							$PessoaCTRL -> insertPessoa();
+							break;
+
+						case 'PUT':
+							if( ! isset( $uriSegments[2] ) ){
+								$PessoaCTRL -> updatePessoa( null );
+							}else{
+								$PessoaCTRL -> updatePessoa( $uriSegments[2] );
+							}
+							break;
+
+						case 'DELETE':
+							$PessoaCTRL -> deletePessoa( $uriSegments[2] );
+							break;
+
+						default:
+							break;
+					}
+				}
+            break;
 		}
 	}
 
