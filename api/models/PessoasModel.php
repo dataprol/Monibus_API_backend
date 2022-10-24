@@ -1,6 +1,6 @@
 <?php
-
-class PessoasModel{
+//namespace Models;
+final class PessoasModel{
     
     var $resultado;
     var $Conn;
@@ -9,8 +9,8 @@ class PessoasModel{
         
         require_once("database/ConexaoClass.php");
         $oConexao = new ConexaoClass();
-        $oConexao -> openConnect();
-        $this -> Conn = $oConexao -> getConnect();
+        $oConexao -> OpenConnect();
+        $this -> Conn = $oConexao -> GetConnect();
 
     }
 
@@ -26,7 +26,7 @@ class PessoasModel{
 
     }
 
-    public function listThis( $nComecarPor, $nItensPorPagina, $id ){
+    public function ListThis( $nComecarPor, $nItensPorPagina, $id ){
 
         $sql = "SELECT idPessoa, nomePessoa, emailPessoa, usuarioPessoa";
         if( $id != null ){
@@ -42,7 +42,7 @@ class PessoasModel{
 
     }
 
-    public function consultPessoa($id){
+    public function ConsultPessoa($id){
 
         $sql = "SELECT * FROM pessoas WHERE idPessoa = " . $id . ";" ;
         
@@ -50,7 +50,7 @@ class PessoasModel{
 
     }
 
-    public function insertPessoa($arraypessoas){
+    public function InsertPessoa($arraypessoas){
 
         $sql = "INSERT INTO pessoas(
                 `nomePessoa`,
@@ -75,7 +75,7 @@ class PessoasModel{
 
     }
 
-    public function updatePessoa($arraypessoas){
+    public function UpdatePessoa($arraypessoas){
 
         $sql = "UPDATE pessoas 
             SET nomePessoa='" . $arraypessoas['nomePessoa'] . "'
@@ -90,15 +90,15 @@ class PessoasModel{
 
     }
 
-    public function deletePessoa($idPessoa){
+    public function DeletePessoa($idPessoa){
 
         $sql = "DELETE FROM pessoas WHERE idPessoa='" . $idPessoa . "';" ;
 
         $this -> resultado = $this -> Conn-> query($sql);
-        
+
     }
 
-    public function getConsult(){
+    public function GetConsult(){
         return $this -> resultado;
     }
 

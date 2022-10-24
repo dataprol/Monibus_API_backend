@@ -22,83 +22,54 @@
 	$rout = str_replace($query_str, "", $rout);
 	$rout = str_replace("?", "", $rout);
 	$uriSegments = explode("/", $rout);
-    
-    if( !isset( $uriSegments[1] ) ){
 
-        require_once("controllers/MainController.php");
-        $Main = new MainController();
-        $Main -> index();
+    if( !isset( $uriSegments[1] ) || empty($uriSegments[1]) ){
+
+		header( 'Content-Type: application/json' );
+		$data['name'] = "End-point principal API do Monibus";
+		$data['message'] = "Esta é a raiz desta API!";
+		$data['code'] = 0;
+		$data['status'] = 200;
+		$retorno['success'] = "true";
+		$retorno['data'] = $data;
+		echo json_encode( $retorno );
+		http_response_code(200);
+		exit;
 
 	}
 	else
 	{
-		
 		switch( $uriSegments[1] ){
 
-            case 'main':
-                
-                require_once("controllers/MainController.php");
-                $Main = new MainController();
-                
-                if( ! isset( $uriSegments[2] ) ){
-                    $Main -> index();
-                }
-                else
-                {
-                    switch( $uriSegments[2] ){
-                        case 'index': $Main -> index(); break;
-                        case 'login': $Main -> login(); break;
-						case 'sd': $Main -> destroySession(); break;
-                    }
-                }
-            break;
-
-            case 'users':
-			
-                require_once("controllers/UsersController.php");
-                $User = new UsersController();
-                if( ! isset( $uriSegments[2] ) ){
-                    $User -> index();
-                }
-                else
-                {
-                    switch( $uriSegments[2] ){
-                        case 'index': $User -> index(); break;
-                        case 'vlogin': $User -> validateLogin(); break;
-                        case 'vtoken': $User -> validateToken(); break;
-                    }
-                }
-            break;
-
             case 'pessoas':
-
+				
 				require_once( "controllers/PessoasController.php" );
 				$PessoaCTRL = new PessoasController();
 				if( ! isset( $request_method ) ){
-					$PessoaCTRL -> listThis();
+					$PessoaCTRL -> ListThis();
 				}
 				else{
 					switch($request_method)
 					{
 						case 'GET':
-							if( ! isset( $uriSegments[2] ) ){
-								$PessoaCTRL -> listThis();
+							if( isset( $uriSegments[2] ) ){
+								$PessoaCTRL -> ConsultPessoa( $uriSegments[2] );
 							}
 							else{
-								$PessoaCTRL -> consultPessoa( $uriSegments[2] );
+								$PessoaCTRL -> ListThis();
 							}
 							break;
 
 						case 'POST':
-							$PessoaCTRL -> insertPessoa();
+							$PessoaCTRL -> InsertPessoa();
 							break;
 
 						case 'PUT':
-							$PessoaCTRL -> updatePessoa( $uriSegments[2] );
+							$PessoaCTRL -> UpdatePessoa( $uriSegments[2] );
 							break;
 
 						case 'DELETE':
-							$PessoaCTRL -> deletePessoa( $uriSegments[2] );
+							$PessoaCTRL -> DeletePessoa( $uriSegments[2] );
 							break;
 
 						default:
@@ -106,6 +77,56 @@
 					}
 				}
             break;
+
+            case 'empresas':
+
+				require_once( "controllers/EmpresasController.php" );
+				$EmpresaCTRL = new EmpresasController();
+				if( ! isset( $request_method ) ){
+					$EmpresaCTRL -> ListThis();
+				}
+				else{
+					switch($request_method)
+					{
+						case 'GET':
+							if( ! isset( $uriSegments[2] ) ){
+								$EmpresaCTRL -> ListThis();
+							}
+							else{
+								$EmpresaCTRL -> ConsultEmpresa( $uriSegments[2] );
+							}
+							break;
+
+						case 'POST':
+							$EmpresaCTRL -> InsertEmpresa();
+							break;
+
+						case 'PUT':
+							$EmpresaCTRL -> UpdateEmpresa( $uriSegments[2] );
+							break;
+
+						case 'DELETE':
+							$EmpresaCTRL -> DeleteEmpresa( $uriSegments[2] );
+							break;
+
+						default:
+							break;
+					}
+				}
+            break;
+			
+			default:
+				header( 'Content-Type: application/json' );
+				$data['name'] = "Recurso Inexistente";
+				$data['message'] = "O recurso requisitado não existe!";
+				$data['code'] = 0;
+				$data['status'] = 404;
+				$retorno['success'] = "false";
+				$retorno['data'] = $data;
+				echo json_encode( $retorno );
+				http_response_code(404);
+				exit;
+			break;
 		}
 	}
 

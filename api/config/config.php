@@ -34,6 +34,7 @@
     "Administrador",
     "Monitor",
     "Cliente",
+    "Responsável",
     "Passageiro" 
     );
 

@@ -1,22 +1,22 @@
 <?php
-//namespace Controlllers;
-final class PessoasController extends BaseController {
-    
+
+final class EmpresasController extends BaseController {
+   
     function __construct(){
 		
-		require_once("models/PessoasModel.php");
-        $this -> Model = new PessoasModel();
+		require_once("models/EmpresasModel.php");
+        $this -> Model = new EmpresasModel();
 		
     }
 
     public function ListThis(){
 
         $result = $this -> ListPagination();
-        $arrayPessoas = array();
+        $arrayEmpresas = array();
         if( $result != false ){
             if( $result -> num_rows > 0 ){ 
                 while( $line = $result -> fetch_assoc() ) {
-                    array_push( $arrayPessoas, $line );
+                    array_push( $arrayEmpresas, $line );
                 }
             }
         }
@@ -28,22 +28,22 @@ final class PessoasController extends BaseController {
         $pagination['itemsTotal'] = $this -> nTotalItens;
         $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
         $retorno['pagination'] = $pagination;
-        $retorno['data'] = $arrayPessoas;
+        $retorno['data'] = $arrayEmpresas;
         echo json_encode( $retorno );
         http_response_code(200);
 
     }
 
-	public function ConsultPessoa( $id ){
+	public function ConsultEmpresa( $id ){
 		
         header( 'Content-Type: application/json' );
         if( isset($id) && strval($id) > 0 ){
-            $this -> Model -> ConsultPessoa( $id );
+            $this -> Model -> ConsultEmpresa( $id );
             $result = $this -> Model -> GetConsult();
-            $pessoa = $result -> fetch_assoc();
+            $empresa = $result -> fetch_assoc();
 
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
-            $retorno['data'] = $pessoa;
+            $retorno['data'] = $empresa;
             echo json_encode($retorno);
             http_response_code(200);
         }else{
@@ -59,22 +59,20 @@ final class PessoasController extends BaseController {
 		
 	}
 
-    public function InsertPessoa(){
+    public function InsertEmpresa(){
 		
-        $oPessoa = json_decode( file_get_contents("php://input") );
+        $oEmpresa = json_decode( file_get_contents("php://input") );
 
-        $arrayPessoas["nomePessoa"] = $oPessoa -> nomePessoa;
-        $arrayPessoas["identidadePessoa"] = $oPessoa -> identidadePessoa;
-        $arrayPessoas["emailPessoa"]  = $oPessoa -> emailPessoa;
-        $arrayPessoas["tipoPessoa"] = $oPessoa -> tipoPessoa;
-        $arrayPessoas["senhaPessoa"] = $oPessoa -> senhaPessoa;
-        $arrayPessoas["usuarioPessoa"] = $oPessoa -> usuarioPessoa;
+        $arrayEmpresas["nomeEmpresa"] = $oEmpresa -> nomeEmpresa;
+        $arrayEmpresas["identidadeEmpresa"] = $oEmpresa -> identidadeEmpresa;
+        $arrayEmpresas["emailEmpresa"]  = $oEmpresa -> emailEmpresa;
+        $arrayEmpresas["telefoneEmpresa"] = $oEmpresa -> telefoneEmpresa;
 
-        $this -> Model -> InsertPessoa($arrayPessoas);
-        $idPessoa = $this -> Model -> GetConsult();
+        $this -> Model -> InsertEmpresa($arrayEmpresas);
+        $idEmpresa = $this -> Model -> GetConsult();
 
         header('Content-Type: application/json');
-        $data['idPessoa'] = $idPessoa;
+        $data['idEmpresa'] = strval($idEmpresa);
         $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
         $retorno['data'] = $data;
         echo json_encode($retorno);
@@ -82,22 +80,21 @@ final class PessoasController extends BaseController {
 
     }
 
-    public function UpdatePessoa( $idPessoa ){
+    public function UpdateEmpresa( $idEmpresa ){
 
-		$oPessoa = json_decode(file_get_contents("php://input"));
+		$oEmpresa = json_decode(file_get_contents("php://input"));
         
-		if( empty( $idPessoa ) ){
-			$idPessoa = $oPessoa -> idPessoa;
+		if( empty( $idEmpresa ) ){
+			$idEmpresa = $oEmpresa -> idEmpresa;
 		}
         
         header('Content-Type: application/json');
-        if( !empty($idPessoa)){
-            $arrayPessoas["idPessoa"] = $idPessoa;
-            $arrayPessoas["nomePessoa"] = $oPessoa -> nomePessoa;
-            $arrayPessoas["emailPessoa"] = $oPessoa -> emailPessoa;
-            $arrayPessoas["senhaPessoa"] = $oPessoa -> senhaPessoa;
-            $arrayPessoas["tipoPessoa"] = $oPessoa -> tipoPessoa;
-            $this -> Model -> UpdatePessoa($arrayPessoas);
+        if( !empty($idEmpresa)){
+            $arrayEmpresas["idEmpresa"] = $idEmpresa;
+            $arrayEmpresas["nomeEmpresa"] = $oEmpresa -> nomeEmpresa;
+            $arrayEmpresas["telefoneEmpresa"] = $oEmpresa -> telefoneEmpresa;
+            $arrayEmpresas["emailEmpresa"] = $oEmpresa -> emailEmpresa;
+            $this -> Model -> UpdateEmpresa($arrayEmpresas);
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             echo json_encode($retorno);
             http_response_code(200);
@@ -114,14 +111,14 @@ final class PessoasController extends BaseController {
         
     }
 
-    public function DeletePessoa( $idPessoa ){
+    public function DeleteEmpresa( $idEmpresa ){
 
-		if( empty( $idPessoa ) ){
-			$idPessoa = json_decode(file_get_contents("php://input")) -> idPessoa;
+		if( empty( $idEmpresa ) ){
+			$idEmpresa = json_decode(file_get_contents("php://input")) -> idEmpresa;
 		}
         header('Content-Type: application/json');
-        if( !empty($idPessoa)){
-            $this -> Model -> DeletePessoa( $idPessoa );
+        if( !empty($idEmpresa)){
+            $this -> Model -> DeleteEmpresa( $idEmpresa );
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             echo json_encode($retorno);
             http_response_code(200);
@@ -137,7 +134,6 @@ final class PessoasController extends BaseController {
         }    
 
     }
-
 }
 
 ?>

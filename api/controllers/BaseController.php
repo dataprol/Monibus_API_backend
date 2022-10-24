@@ -12,21 +12,23 @@ class BaseController{
     var $nTotalPaginas = 0;
     var $cViewListURL;
     var $nComecarPor;
-    var $SecondParam = null;
+    var $nIdSegundaTabela = null;
 
     public function __construct(){}
 
-    public function index(){
-        $this -> listThis();
+    public function Index(){
+        $this -> ListThis();
     }
 
-    public function listThis(){}
+    public function ListThis(){}
 
-    public function listPagination($pagina,$SecondParam){
-
+    public function ListPagination(){
+ 
+        $pagina = intval( isset($_GET["pag"]) ? $_GET["pag"] : $this -> nPagina ) ;
+        $nIdSegundaTabela = $this -> nIdSegundaTabela ;
         // Paginação
-        $this -> Model -> CountRows( $SecondParam );
-        $linha = $this -> Model -> getConsult() -> fetch_assoc();
+        $this -> Model -> CountRows( $nIdSegundaTabela );
+        $linha = $this -> Model -> GetConsult() -> fetch_assoc();
         $this -> nTotalItens = intval( $linha["total_linhas"] );
         $this -> nTotalPaginas = ceil( $this -> nTotalItens / $this -> PaginacaoItensPorPagina );
         if( isset($pagina) and $pagina > 0 ){
@@ -36,6 +38,13 @@ class BaseController{
             $this -> nPagina = $this -> nTotalPaginas;
         }
         $this -> nComecarPor = $this -> PaginacaoItensPorPagina * ( $this -> nPagina - 1 );
+
+        $this -> Model -> ListThis( 
+                                $this -> nComecarPor, 
+                                $this -> PaginacaoItensPorPagina, 
+                                $this -> nIdSegundaTabela );
+        
+        return $this -> Model -> GetConsult();
 
     }
 

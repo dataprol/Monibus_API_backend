@@ -4,7 +4,7 @@ class ConexaoClass{
     
     var $oConexaoInterna;
 
-    public function openConnect(){
+    public function OpenConnect(){
 
         global $db;
 
@@ -19,11 +19,11 @@ class ConexaoClass{
         }
     }
 
-    public function getConnect(){
+    public function GetConnect(){
         return $this -> oConexaoInterna;
     }
 
-    public function closeConnect(){
+    public function CloseConnect(){
 
         if( isset( $oConexaoInterna ) ){
             $oConexaoInterna -> close();
