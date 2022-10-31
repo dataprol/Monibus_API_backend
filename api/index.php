@@ -114,6 +114,154 @@
 					}
 				}
             break;
+
+            case 'carros':
+
+				require_once( "controllers/CarrosController.php" );
+				$CarroCTRL = new CarrosController();
+				if( ! isset( $request_method ) ){
+					$CarroCTRL -> ListThis();
+				}
+				else{
+					switch($request_method)
+					{
+						case 'GET':
+							if( ! isset( $uriSegments[2] ) ){
+								$CarroCTRL -> ListThis();
+							}
+							else{
+								$CarroCTRL -> ConsultCarro( $uriSegments[2] );
+							}
+							break;
+
+						case 'POST':
+							$CarroCTRL -> InsertCarro();
+							break;
+
+						case 'PUT':
+							$CarroCTRL -> UpdateCarro( $uriSegments[2] );
+							break;
+
+						case 'DELETE':
+							$CarroCTRL -> DeleteCarro( $uriSegments[2] );
+							break;
+
+						default:
+							break;
+					}
+				}
+            break;
+			
+            case 'linhas':
+
+				require_once( "controllers/LinhasController.php" );
+				$LinhaCTRL = new LinhasController();
+				if( ! isset( $request_method ) ){
+					$LinhaCTRL -> ListThis();
+				}
+				else{
+					switch($request_method)
+					{
+						case 'GET':
+							if( ! isset( $uriSegments[2] ) ){
+								$LinhaCTRL -> ListThis();
+							}
+							else{
+								$LinhaCTRL -> ConsultLinha( $uriSegments[2] );
+							}
+							break;
+
+						case 'POST':
+							$LinhaCTRL -> InsertLinha();
+							break;
+
+						case 'PUT':
+							$LinhaCTRL -> UpdateLinha( $uriSegments[2] );
+							break;
+
+						case 'DELETE':
+							$LinhaCTRL -> DeleteLinha( $uriSegments[2] );
+							break;
+
+						default:
+							break;
+					}
+				}
+            break;
+			
+            case 'contratos':
+
+				require_once( "controllers/ContratosController.php" );
+				$ContratoCTRL = new ContratosController();
+				if( ! isset( $request_method ) ){
+					$ContratoCTRL -> ListThis();
+				}
+				else{
+					switch($request_method)
+					{
+						case 'GET':
+							if( ! isset( $uriSegments[2] ) ){
+								$ContratoCTRL -> ListThis();
+							}
+							else{
+								$ContratoCTRL -> ConsultContrato( $uriSegments[2] );
+							}
+							break;
+
+						case 'POST':
+							$ContratoCTRL -> InsertContrato();
+							break;
+
+						case 'PUT':
+							$ContratoCTRL -> UpdateContrato( $uriSegments[2] );
+							break;
+
+						case 'DELETE':
+							$ContratoCTRL -> DeleteContrato( $uriSegments[2] );
+							break;
+
+						default:
+							break;
+					}
+				}
+            break;
+
+			case 'turnos':
+
+				require_once( "controllers/TurnosController.php" );
+				$TurnoCTRL = new TurnosController();
+				if( ! isset( $request_method ) ){
+					$TurnoCTRL -> ListThis();
+				}
+				else{
+					switch($request_method)
+					{
+						case 'GET':
+							if( ! isset( $uriSegments[2] ) ){
+								$TurnoCTRL -> ListThis();
+							}
+							else{
+								$TurnoCTRL -> ConsultTurno( $uriSegments[2] );
+							}
+							break;
+
+						case 'POST':
+							$TurnoCTRL -> InsertTurno();
+							break;
+
+						case 'PUT':
+							$TurnoCTRL -> UpdateTurno( $uriSegments[2] );
+							break;
+
+						case 'DELETE':
+							$TurnoCTRL -> DeleteTurno( $uriSegments[2] );
+							break;
+
+						default:
+							break;
+					}
+				}
+            break;
 			
 			default:
 				header( 'Content-Type: application/json' );

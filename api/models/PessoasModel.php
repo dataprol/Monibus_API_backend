@@ -14,24 +14,24 @@ final class PessoasModel{
 
     }
 
-    public function CountRows($id){
+    public function CountRows($nidrelacionamento){
         
         $sql = "SELECT COUNT(*) as total_linhas FROM pessoas";
-        if( $id != null ){
+        if( $nidrelacionamento != null ){
             $sql .= ", responsaveis_tem_dependentes";
-            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $id";
+            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $nidrelacionamento";
             $sql .= " and pessoas.idPessoa = responsaveis_tem_dependentes.idDependente";
         }
         $this -> resultado = $this -> Conn -> query( $sql );
 
     }
 
-    public function ListThis( $nComecarPor, $nItensPorPagina, $id ){
+    public function ListThis( $nComecarPor, $nItensPorPagina, $nidrelacionamento ){
 
         $sql = "SELECT idPessoa, nomePessoa, emailPessoa, usuarioPessoa";
-        if( $id != null ){
+        if( $nidrelacionamento != null ){
             $sql .= ", responsaveis_tem_dependentes";
-            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $id";
+            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $nidrelacionamento";
             $sql .= " and pessoas.idPessoa = responsaveis_tem_dependentes.idDependente";
         }
         $sql .= " FROM pessoas";
@@ -90,9 +90,9 @@ final class PessoasModel{
 
     }
 
-    public function DeletePessoa($idPessoa){
+    public function DeletePessoa($id){
 
-        $sql = "DELETE FROM pessoas WHERE idPessoa='" . $idPessoa . "';" ;
+        $sql = "DELETE FROM pessoas WHERE idPessoa='" . $id . "';" ;
 
         $this -> resultado = $this -> Conn-> query($sql);
 

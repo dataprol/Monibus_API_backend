@@ -19,18 +19,10 @@ final class PessoasController extends BaseController {
                     array_push( $arrayPessoas, $line );
                 }
             }
+            $this -> RespostaBoaHTTP(200,$arrayPessoas);
+        }else{
+            $this -> RespostaRuimHTTP(500,"Algo deu errado em nosso servidor!","Erro Interno",0);
         }
-
-        header( 'Content-Type: application/json' );
-        $pagination['page'] = $this -> nPagina;
-        $pagination['pagesTotal'] = $this -> nTotalPaginas;
-        $pagination['itemsPerPage'] = $this -> PaginacaoItensPorPagina;
-        $pagination['itemsTotal'] = $this -> nTotalItens;
-        $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
-        $retorno['pagination'] = $pagination;
-        $retorno['data'] = $arrayPessoas;
-        echo json_encode( $retorno );
-        http_response_code(200);
 
     }
 
@@ -47,14 +39,7 @@ final class PessoasController extends BaseController {
             echo json_encode($retorno);
             http_response_code(200);
         }else{
-            $data['name'] = "Requisição Mal Feita";
-            $data['message'] = "Requisição mal feita! Revisar a sintaxe!";
-            $data['code'] = 0;
-            $data['status'] = 400;
-            $retorno['success'] = "false";
-            $retorno['data'] = $data;
-            echo json_encode( $retorno );
-            http_response_code(400);
+            $this -> RespostaRuimHTTP(400,"Requisição mal feita! Revisar a sintaxe!","Requisição Mal Feita",0);
         }
 		
 	}
@@ -102,14 +87,7 @@ final class PessoasController extends BaseController {
             echo json_encode($retorno);
             http_response_code(200);
         }else{
-            $data['name'] = "Requisição Mal Feita";
-            $data['message'] = "Requisição mal feita! Revisar a sintaxe!";
-            $data['code'] = 0;
-            $data['status'] = 400;
-            $retorno['success'] = "false";
-            $retorno['data'] = $data;
-            echo json_encode( $retorno );
-            http_response_code(400);
+            $this -> RespostaRuimHTTP(400,"Requisição mal feita! Revisar a sintaxe!","Requisição Mal Feita",0);
         }
         
     }
@@ -126,15 +104,8 @@ final class PessoasController extends BaseController {
             echo json_encode($retorno);
             http_response_code(200);
         }else{
-            $data['name'] = "Requisição Mal Feita";
-            $data['message'] = "Requisição mal feita! Revisar a sintaxe!";
-            $data['code'] = 0;
-            $data['status'] = 400;
-            $retorno['success'] = "false";
-            $retorno['data'] = $data;
-            echo json_encode( $retorno );
-            http_response_code(400);
-        }    
+            $this -> RespostaRuimHTTP(400,"Requisição mal feita! Revisar a sintaxe!","Requisição Mal Feita",0);
+        }
 
     }
 
