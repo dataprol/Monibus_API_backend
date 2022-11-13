@@ -102,6 +102,22 @@ final class PessoasModel{
         return $this -> resultado;
     }
 
+    public function consultUsuario( $username ){
+
+        $sql = "SELECT * FROM pessoas 
+                WHERE usuarioPessoa='$username'";
+        $this -> resultado = $this -> Conn -> query( $sql );
+
+    }
+
+    public function ConsultUsuarioEmail( $usuarioEmail ){
+        
+        $sql = "SELECT * FROM users 
+                WHERE usuarioEmail='" . $usuarioEmail . "'";
+        $this -> resultado = $this -> Conn -> query( $sql );
+
+    }
+
 }
 
 ?>

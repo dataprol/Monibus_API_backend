@@ -13,10 +13,11 @@ class ConexaoClass{
         $password = $db["password"];
 		$dbname = $db["database"];
 
-        $this -> oConexaoInterna = new mysqli( $servername, $username, $password, $dbname );
+        $this -> oConexaoInterna = new mysqli( $servername, $username, $password, $dbname, null, null );
         if( $this -> oConexaoInterna -> connect_error ){
             die( "Conexão com banco de dados " . $dbname . " falhou: " . $this -> oConexaoInterna -> connect_error );
         }
+        $this -> oConexaoInterna -> set_charset('utf8');
     }
 
     public function GetConnect(){

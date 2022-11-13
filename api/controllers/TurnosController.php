@@ -28,14 +28,14 @@ final class TurnosController extends BaseController {
 
 	public function ConsultTurno( $id ){
 		
-        header( 'Content-Type: application/json' );
         if( isset($id) && strval($id) > 0 ){
             $this -> Model -> ConsultTurno( $id );
             $result = $this -> Model -> GetConsult();
             $turno = $result -> fetch_assoc();
-
+            
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             $retorno['data'] = $turno;
+            header( 'Content-Type: application/json' );
             echo json_encode($retorno);
             http_response_code(200);
         }else{
@@ -55,10 +55,10 @@ final class TurnosController extends BaseController {
             $this -> Model -> InsertTurno($arrayTurnos);
             $idTurno = $this -> Model -> GetConsult();
     
-            header('Content-Type: application/json');
             $data['idTurno'] = strval($idTurno);
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             $retorno['data'] = $data;
+            header('Content-Type: application/json');
             echo json_encode($retorno);
             http_response_code(201);
         }else{
@@ -77,7 +77,6 @@ final class TurnosController extends BaseController {
 		}
         
         if( !empty($idTurno)){
-            header('Content-Type: application/json');
             $arrayTurnos["idTurno"] = $idTurno;
             isset($oTurno -> horarioInicialTurno) ? $arrayTurnos["horarioInicialTurno"] = $oTurno -> horarioInicialTurno : $lRetorno = false;
             isset($oTurno -> horarioFinalTurno) ? $arrayTurnos["horarioFinalTurno"] = $oTurno -> horarioFinalTurno : $lRetorno = false;
@@ -85,6 +84,7 @@ final class TurnosController extends BaseController {
             if( $lRetorno ){
                 $this -> Model -> UpdateTurno($arrayTurnos);
                 $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+                header('Content-Type: application/json');
                 echo json_encode($retorno);
                 http_response_code(200);
             }else{
@@ -101,10 +101,10 @@ final class TurnosController extends BaseController {
 		if( empty( $idTurno ) ){
 			$idTurno = json_decode(file_get_contents("php://input")) -> idTurno;
 		}
-        header('Content-Type: application/json');
         if( !empty($idTurno)){
             $this -> Model -> DeleteTurno( $idTurno );
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+            header('Content-Type: application/json');
             echo json_encode($retorno);
             http_response_code(200);
         }else{

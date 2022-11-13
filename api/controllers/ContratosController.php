@@ -28,14 +28,14 @@ final class ContratosController extends BaseController {
 
 	public function ConsultContrato( $id ){
 		
-        header( 'Content-Type: application/json' );
         if( isset($id) && strval($id) > 0 ){
             $this -> Model -> ConsultContrato( $id );
             $result = $this -> Model -> GetConsult();
             $contrato = $result -> fetch_assoc();
-
+            
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             $retorno['data'] = $contrato;
+            header( 'Content-Type: application/json' );
             echo json_encode($retorno);
             http_response_code(200);
         }else{
@@ -55,15 +55,17 @@ final class ContratosController extends BaseController {
         isset($oContrato -> idPessoa) ? $arrayContratos["idPessoa"] = $oContrato -> idPessoa : $lRetorno = false;
         isset($oContrato -> idTurno) ? $arrayContratos["idTurno"] = $oContrato -> idTurno : $lRetorno = false;
         isset($oContrato -> idLinha) ? $arrayContratos["idLinha"] = $oContrato -> idLinha : $lRetorno = false;
-
+        /* será que o objeto oContrato não pode 
+        ser repassado à Model, ao invés de 
+        armazenar cada valor na matriz arrayContratos? */
         if($lRetorno){
             $this -> Model -> InsertContrato($arrayContratos);
             $idContrato = $this -> Model -> GetConsult();
     
-            header('Content-Type: application/json');
             $data['idContrato'] = strval($idContrato);
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             $retorno['data'] = $data;
+            header('Content-Type: application/json');
             echo json_encode($retorno);
             http_response_code(201);
         }else{
@@ -82,7 +84,6 @@ final class ContratosController extends BaseController {
 		}
         
         if( !empty($idContrato)){
-            header('Content-Type: application/json');
             $arrayContratos["idContrato"] = $idContrato;
             isset($oContrato -> numeroContrato) ? $arrayContratos["numeroContrato"] = $oContrato -> numeroContrato : $lRetorno = false;
             isset($oContrato -> dataInicio) ? $arrayContratos["dataInicio"] = $oContrato -> dataInicio : $lRetorno = false;
@@ -94,6 +95,7 @@ final class ContratosController extends BaseController {
             if( $lRetorno ){
                 $this -> Model -> UpdateContrato($arrayContratos);
                 $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+                header('Content-Type: application/json');
                 echo json_encode($retorno);
                 http_response_code(200);
             }else{
@@ -110,10 +112,10 @@ final class ContratosController extends BaseController {
 		if( empty( $idContrato ) ){
 			$idContrato = json_decode(file_get_contents("php://input")) -> idContrato;
 		}
-        header('Content-Type: application/json');
         if( !empty($idContrato)){
             $this -> Model -> DeleteContrato( $idContrato );
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+            header('Content-Type: application/json');
             echo json_encode($retorno);
             http_response_code(200);
         }else{

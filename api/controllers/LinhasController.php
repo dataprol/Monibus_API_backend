@@ -28,14 +28,14 @@ final class LinhasController extends BaseController {
 
 	public function ConsultLinha( $id ){
 		
-        header( 'Content-Type: application/json' );
         if( isset($id) && strval($id) > 0 ){
             $this -> Model -> ConsultLinha( $id );
             $result = $this -> Model -> GetConsult();
             $linha = $result -> fetch_assoc();
-
+            
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             $retorno['data'] = $linha;
+            header( 'Content-Type: application/json' );
             echo json_encode($retorno);
             http_response_code(200);
         }else{
@@ -56,10 +56,10 @@ final class LinhasController extends BaseController {
             $this -> Model -> InsertLinha($arrayLinhas);
             $idLinha = $this -> Model -> GetConsult();
     
-            header('Content-Type: application/json');
             $data['idLinha'] = strval($idLinha);
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             $retorno['data'] = $data;
+            header('Content-Type: application/json');
             echo json_encode($retorno);
             http_response_code(201);
         }else{
@@ -78,7 +78,6 @@ final class LinhasController extends BaseController {
 		}
         
         if( !empty($idLinha)){
-            header('Content-Type: application/json');
             $arrayLinhas["idLinha"] = $idLinha;
             isset($oLinha -> nomeLinha) ? $arrayLinhas["nomeLinha"] = $oLinha -> nomeLinha : $lRetorno = false;
             isset($oLinha -> idEmpresa) ? $arrayLinhas["idEmpresa"] = $oLinha -> idEmpresa : $lRetorno = false;            
@@ -86,6 +85,7 @@ final class LinhasController extends BaseController {
             if( $lRetorno ){
                 $this -> Model -> UpdateLinha($arrayLinhas);
                 $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+                header('Content-Type: application/json');
                 echo json_encode($retorno);
                 http_response_code(200);
             }else{
@@ -102,10 +102,10 @@ final class LinhasController extends BaseController {
 		if( empty( $idLinha ) ){
 			$idLinha = json_decode(file_get_contents("php://input")) -> idLinha;
 		}
-        header('Content-Type: application/json');
         if( !empty($idLinha)){
             $this -> Model -> DeleteLinha( $idLinha );
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+            header('Content-Type: application/json');
             echo json_encode($retorno);
             http_response_code(200);
         }else{

@@ -28,14 +28,14 @@ final class CarrosController extends BaseController {
 
 	public function ConsultCarro( $id ){
 		
-        header( 'Content-Type: application/json' );
         if( isset($id) && strval($id) > 0 ){
             $this -> Model -> ConsultCarro( $id );
             $result = $this -> Model -> GetConsult();
             $carro = $result -> fetch_assoc();
-
+            
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             $retorno['data'] = $carro;
+            header( 'Content-Type: application/json' );
             echo json_encode($retorno);
             http_response_code(200);
         }else{
@@ -55,10 +55,10 @@ final class CarrosController extends BaseController {
             $this -> Model -> InsertCarro($arrayCarros);
             $idCarro = $this -> Model -> GetConsult();
     
-            header('Content-Type: application/json');
             $data['idCarro'] = strval($idCarro);
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             $retorno['data'] = $data;
+            header('Content-Type: application/json');
             echo json_encode($retorno);
             http_response_code(201);
         }else{
@@ -77,13 +77,13 @@ final class CarrosController extends BaseController {
 		}
         
         if( !empty($idCarro)){
-            header('Content-Type: application/json');
             $arrayCarros["idCarro"] = $idCarro;
             isset($oCarro -> nomeCarro) ? $arrayCarros["nomeCarro"] = $oCarro -> nomeCarro : $lRetorno = false;
             isset($oCarro -> idEmpresa) ? $arrayCarros["idEmpresa"] = $oCarro -> idEmpresa : $lRetorno = false;            
             if( $lRetorno ){
                 $this -> Model -> UpdateCarro($arrayCarros);
                 $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+                header('Content-Type: application/json');
                 echo json_encode($retorno);
                 http_response_code(200);
             }else{
@@ -100,10 +100,10 @@ final class CarrosController extends BaseController {
 		if( empty( $idCarro ) ){
 			$idCarro = json_decode(file_get_contents("php://input")) -> idCarro;
 		}
-        header('Content-Type: application/json');
         if( !empty($idCarro)){
             $this -> Model -> DeleteCarro( $idCarro );
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+            header('Content-Type: application/json');
             echo json_encode($retorno);
             http_response_code(200);
         }else{

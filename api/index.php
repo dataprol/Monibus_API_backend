@@ -40,6 +40,43 @@
 	else
 	{
 		switch( $uriSegments[1] ){
+			
+            case 'main':
+                
+                require_once("controllers/MainController.php");
+                $Main = new MainController();
+                
+                if( ! isset( $uriSegments[2] ) ){
+                    $Main -> Index();
+                }
+                else
+                {
+                    switch( $uriSegments[2] ){
+                        case 'index': $Main -> Index(); break;
+                        case 'login': $Main -> Login(); break;
+						case 'sd': $Main -> DestroySession(); break;
+                    }
+                }
+			break;
+
+            case 'usuarios':
+			
+                require_once("controllers/UsuariosController.php");
+                $User = new UsuariosController();
+                if( ! isset( $uriSegments[2] ) ){
+                    $User -> Index();
+                }
+                else
+                {
+                    switch( $uriSegments[2] ){
+                        case 'index': $User -> Index(); break;
+                        case 'vlogin': $User -> ValidateLogin(); break;
+                        case 'vtoken': $User -> ValidateToken(); break;
+						default:
+						break;
+					}
+				}
+			break;
 
             case 'pessoas':
 				

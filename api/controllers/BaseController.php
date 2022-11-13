@@ -24,9 +24,13 @@ class BaseController{
 
     public function ListPagination(){
  
-        $this -> nPagina = intval( isset($_GET["pagina"]) ? $_GET["pagina"] : $this -> nPagina ) ;
-        $this -> PaginacaoItensPorPagina = intval( isset($_GET["itensPorPagina"]) ? $_GET["itensPorPagina"] : $this -> PaginacaoItensPorPagina ) ;
-        $nIdRelacionamento = $this -> nIdRelacionamento ;
+        if( isset($_GET["pagina"]) && intval( $_GET["pagina"] ) > 0 ){
+            $this -> nPagina = intval( $_GET["pagina"] );
+        }
+        if( isset($_GET["itensPorPagina"]) && intval( $_GET["itensPorPagina"] ) > 0 ){
+            $this -> PaginacaoItensPorPagina = intval( $_GET["itensPorPagina"] );
+        }
+        $nIdRelacionamento = $this -> nIdRelacionamento;
         $this -> Model -> CountRows( $nIdRelacionamento );
         $linha = $this -> Model -> GetConsult() -> fetch_assoc();
         $this -> nTotalItens = intval( $linha["total_linhas"] );
@@ -46,30 +50,41 @@ class BaseController{
     }
 
     public function RespostaRuimHTTP($nCodigoHTTP,$cMensagem,$cNome,$nCodigo){
-
-        $data['nome'] = $cNome;
-        $data['mensagem'] = $cMensagem;
-        $data['código'] = $nCodigo;
-        $data['situação'] = $nCodigoHTTP;
-        $retorno['sucesso'] = "false";
-        $retorno['dados'] = $data;
-        echo json_encode( $retorno );
-        http_response_code($nCodigoHTTP);
+        
+        $data['name'] = $cNome;
+        $data['menssage'] = $cMensagem;
+        $data['code'] = $nCodigo;
+        $data['status'] = $nCodigoHTTP;
+        $retornoHASH['success'] = "false";
+        $retornoHASH['data'] = $data;
+        header( 'Content-Type: application/json' );
+        $retornoJSON =  json_encode( $retornoHASH );
+        if($retornoJSON){
+            echo $retornoJSON;
+        }else{
+            echo '{"message":"Erro na tentativa de conversão para JSON!","success":"false"}';
+        }
+        http_response_code( $nCodigoHTTP );
 
     }
 
     public function RespostaBoaHTTP($nCodigoHTTP,$arrayItens){
 
+        $pagination['page'] = $this -> nPagina;
+        $pagination['pagesTotal'] = $this -> nTotalPaginas;
+        $pagination['itemsPerPage'] = $this -> PaginacaoItensPorPagina;
+        $pagination['itemsTotal'] = $this -> nTotalItens;
+        $retornoHASH['success'] = "true";
+        $retornoHASH['pagination'] = $pagination;
+        $retornoHASH['data'] = $arrayItens;
+        $retornoJSON = json_encode( $retornoHASH );
         header( 'Content-Type: application/json' );
-        $pagination['página'] = $this -> nPagina;
-        $pagination['páginasTotais'] = $this -> nTotalPaginas;
-        $pagination['itensPorPágina'] = $this -> PaginacaoItensPorPagina;
-        $pagination['itensTotais'] = $this -> nTotalItens;
-        $retorno['sucesso'] = "true";
-        $retorno['paginação'] = $pagination;
-        $retorno['dados'] = $arrayItens;
-        echo json_encode( $retorno );
-        http_response_code($nCodigoHTTP);
+        if($retornoJSON){
+            echo $retornoJSON;
+        }else{
+            $this -> RespostaRuimHTTP(500,"Algo deu errado com a conversão para JSON!","Erro Interno",0);
+        }
+        http_response_code( $nCodigoHTTP );
 
     }
 
