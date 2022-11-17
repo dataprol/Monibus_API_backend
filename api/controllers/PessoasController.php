@@ -73,9 +73,6 @@ final class PessoasController extends BaseController {
         isset($oPessoa -> tipoPessoa) ? $arrayPessoas["tipoPessoa"] = $oPessoa -> tipoPessoa : $lRetorno = false;
         isset($oPessoa -> senhaPessoa) ? $arrayPessoas["senhaPessoa"] = $oPessoa -> senhaPessoa : $lRetorno = false;
         isset($oPessoa -> usuarioPessoa) ? $arrayPessoas["usuarioPessoa"] = $oPessoa -> usuarioPessoa : $lRetorno = false;
-        /* será que o objeto oPessoa não pode 
-        ser repassado à Model, ao invés de 
-        armazenar cada valor na matriz arrayPessoas? */
 
 /*         // Confere se login já está em uso
         $this -> Model -> ConsultUsuario( $_POST["usuarioPessoa"] );
@@ -97,7 +94,7 @@ final class PessoasController extends BaseController {
             $this -> Model -> InsertPessoa($arrayPessoas);
             $idPessoa = $this -> Model -> GetConsult();
 
-            $this -> SendMail();
+            $this -> Parte2();
 
             header('Content-Type: application/json');
             $data['idPessoa'] = $idPessoa;
@@ -105,14 +102,17 @@ final class PessoasController extends BaseController {
             $retorno['data'] = $data;
             echo json_encode($retorno);
             http_response_code(201);
+
         }else{
+
             $this -> RespostaRuimHTTP(400,"Requisição mal feita! Revisar a sintaxe!","Requisição Mal Feita",0);
             exit;
+            
         }
 
     }
 
-    public function SendMail(){
+    public function Parte2(){
 
         // Gera nova senha provisória e cadastra o usuário
         $novaSenha = $this -> gerar_senha( 6, true, true, true, true );
@@ -180,10 +180,10 @@ final class PessoasController extends BaseController {
             // Envia mensagem por e-Mail
             $cMailCharSet = 'UTF-8';
             $cMailHeaders = '';
-            $cMailOrigem = 'suporte@dataprol.com.br';
-            $cMailNomeOrigem = 'Suporte Dataprol Sistemas';
-            $cMailResposta = 'suporte@dataprol.com.br';
-            $cMailNomeResposta = 'Suporte Dataprol Sistemas';
+            $cMailOrigem = 'sac@monibus.tecnologia.ws';
+            $cMailNomeOrigem = 'SAC Monibus';
+            $cMailResposta = 'sac@monibus.tecnologia.ws';
+            $cMailNomeResposta = 'SAC Monibus';
             $cMailDestino = $arrayUsers["usuarioEmail"];
             $cMailNomeDestino = $arrayUsers["usuarioNome"];
             $cMailAssunto = 'Seu usuário ' . $arrayUsers["usuarioLogin"] . ' foi criado com sucesso' ;
@@ -193,10 +193,10 @@ final class PessoasController extends BaseController {
                 <meta name="author" content="Luiz Carlos Costa Rodrigues born in Santa Maria RS Brazil, www.dataprol.com.br">
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no">
                 <head>
-                    <title>Novo Usuário Dataprol</title>
+                    <title>Novo Usuário Monibus</title>
                 </head>
                 <body>
-                    <h1>Novo Usuário Dataprol</h1>
+                    <h1>Novo Usuário Monibus</h1>
                     <h3>Seu cadastro foi concluído, com sucesso!</h3>
                     <p>Nome: ' . $arrayUsers["usuarioNome"] . '<br>
                     Usuário: <b>' . $arrayUsers["usuarioLogin"] . '</b><br>
@@ -204,15 +204,15 @@ final class PessoasController extends BaseController {
                     <b>
                     Validade: ' . $prazoDias . ' dias</b>
                     <br>
-                    Para trocar a senha, acesse <b><a href="https://dataprol.com.br/painel">Área do Cliente Dataprol</a></b>, 
+                    Para trocar a senha, acesse <b><a href="http://monibus.tecnologia.ws/painel">Área do Cliente Monibus</a></b>, 
                     entre com sua senha provisória, clique na sua imagem, no canto superior direito da tela, e clique em <b>Trocar Senha</b>.
                     <br>
                     <b>Troque sua senha, o quanto antes, para evitar seu bloqueio.</b>
                     </p>
                     <br><br>
-                    Luiz Carlos Costa Rodrigues - Dataprol
+                    Luiz Carlos Costa Rodrigues - Monibus
                     <br>
-                    <a href="https://www.dataprol.com.br/">www.dataprol.com.br</a>
+                    <a href="http://www.monibus.tecnologia.ws/">www.monibus.tecnologia.ws</a>
                 </body>
             </html>
             ';
@@ -225,15 +225,15 @@ final class PessoasController extends BaseController {
             $this -> Mail -> isSMTP();                                      // Configura o disparo como SMTP
             $this -> Mail -> Host = 'email-ssl.com.br';                        // Especifica o enderço do servidor SMTP da Locaweb
             $this -> Mail -> SMTPAuth = true;                               // Habilita a autenticação SMTP
-            $this -> Mail -> Username = 'luiz@dataprol.com.br';                        // Usuário do SMTP
-            $this -> Mail -> Password = 'DpLc*494875';                          // Senha do SMTP
+            $this -> Mail -> Username = 'sac@monibus.tecnologia.ws';                        // Usuário do SMTP
+            $this -> Mail -> Password = 'Ms*494875';                          // Senha do SMTP
             $this -> Mail -> SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;                            // Habilita criptografia TLS | 'ssl' também é possível
             $this -> Mail -> Port = 587;                                    // Porta TCP para a conexão
             
             $this -> Mail -> From = $cMailOrigem;                          // Endereço previamente verificado no painel do SMTP
             $this -> Mail -> FromName = $cMailNomeResposta;                     // Nome no remetente
             $this -> Mail -> addAddress($cMailDestino, $cMailNomeDestino);// Acrescente um destinatário
-            $this -> Mail -> addAddress('luiz@dataprol.com.br');                // O nome é opcional
+            $this -> Mail -> addAddress('sac@monibus.tecnologia.ws');                // O nome é opcional
             $this -> Mail -> addReplyTo($cMailOrigem, $cMailNomeResposta);
             //$this -> Mail -> addCC('cc@exemplo.com');
             //$this -> Mail -> addBCC('bcc@exemplo.com');
