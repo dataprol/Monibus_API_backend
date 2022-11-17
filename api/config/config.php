@@ -14,6 +14,12 @@
     // Detecta se está em produção ou teste e faz ajustes//
     if( $_SERVER['SERVER_NAME'] == 'localhost' ){
 
+        // Banco de dados
+        $sisConfig['banco_de_dados'] = $bd_local;
+
+        // Servidor de email
+        $sisConfig['email_servidor'] = $mail_server;
+
         $db = $bd_local;
         $activeConfig = 'dev';
         $cHTTP_SERVER = '/dev/aulas/Monibus_PDS/api';
@@ -23,6 +29,12 @@
 
     }else{
         
+        // Banco de dados
+        $sisConfig['banco_de_dados'] = $bd_local;
+
+        // Servidor de email
+        $sisConfig['email_servidor'] = $mail_server;
+
         $db = $bd_remoto;
         $activeConfig = 'prod';
         $cHTTP_SERVER ='/api';

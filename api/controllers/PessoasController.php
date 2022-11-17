@@ -223,13 +223,13 @@ final class PessoasController extends BaseController {
             //$this -> Mail -> SMTPDebug = SMTP::DEBUG_SERVER;                               // Habilita a saída do tipo "verbose"
             
             $this -> Mail -> isSMTP();                                      // Configura o disparo como SMTP
-            $this -> Mail -> Host = 'email-ssl.com.br';                        // Especifica o enderço do servidor SMTP da Locaweb
+            $this -> Mail -> Host = $Config['hostname'];                        // Especifica o enderço do servidor SMTP da Locaweb
             $this -> Mail -> SMTPAuth = true;                               // Habilita a autenticação SMTP
-            $this -> Mail -> Username = 'sac@monibus.tecnologia.ws';                        // Usuário do SMTP
-            $this -> Mail -> Password = 'xxxxx';                          // Senha do SMTP
+            $this -> Mail -> Username = $Config['username'];                        // Usuário do SMTP
+            $this -> Mail -> Password = $Config['password'];                          // Senha do SMTP
             $this -> Mail -> SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;                            // Habilita criptografia TLS | 'ssl' também é possível
             $this -> Mail -> Port = 587;                                    // Porta TCP para a conexão
-            
+          
             $this -> Mail -> From = $cMailOrigem;                          // Endereço previamente verificado no painel do SMTP
             $this -> Mail -> FromName = $cMailNomeResposta;                     // Nome no remetente
             $this -> Mail -> addAddress($cMailDestino, $cMailNomeDestino);// Acrescente um destinatário
