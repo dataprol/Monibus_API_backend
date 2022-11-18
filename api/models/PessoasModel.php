@@ -65,7 +65,7 @@ final class PessoasModel{
                     '" . $arraypessoas['identidadePessoa'] . "', 
                     '" . $arraypessoas['emailPessoa'] . "', 
                     '" . $arraypessoas['tipoPessoa'] . "', 
-                    '" . $arraypessoas['senhaPessoa'] . "', 
+                    '" . md5($arraypessoas['senhaPessoa']) . "', 
                     '" . $arraypessoas['usuarioPessoa'] . "', 
                     now()
                     );";
@@ -81,8 +81,6 @@ final class PessoasModel{
             SET nomePessoa='" . $arraypessoas['nomePessoa'] . "'
                 ,emailPessoa='" . $arraypessoas['emailPessoa'] . "'
                 ,identidadePessoa='" . $arraypessoas['identidadePessoa'] . "'
-                ,usuarioPessoa='" . $arraypessoas['usuarioPessoa'] . "'
-                ,senhaPessoa='" . $arraypessoas['senhaPessoa'] . "'
                 ,tipoPessoa='" . $arraypessoas['tipoPessoa'] . "' 
             WHERE idPessoa=" . $arraypessoas['idPessoa'] . ";" ;
 

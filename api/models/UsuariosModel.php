@@ -42,4 +42,15 @@ class UsuariosModel{
         return $this -> resultado;
 
     }
+    
+    public function AtualizarSenhaUsuario($arrayUsers){
+
+        $sql = "UPDATE pessoas 
+                SET senhaPessoa='" . md5( $arrayUsers['senhaPessoa'] ) . "', 
+                WHERE idPessoa=" . $arrayUsers['idPessoa'] ;
+                //senhaValidadePessoa='" . $arrayUsers['senhaValidadePessoa'] . "' 
+        $this -> resultado = $this -> Conn -> query($sql);
+        
+    }
+
 }

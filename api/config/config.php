@@ -64,4 +64,5 @@
     define( "_FMT_DATA", "%d/%m/%Y" );
     define( "_FMT_DATA_HORA", "%d/%m/%Y %Hh%M" );
     define( "_PaginacaoItensPorPagina", 5 );
+    define( "_SisConfigGeral", $sisConfig );
 ?>

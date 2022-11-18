@@ -74,19 +74,11 @@ final class PessoasController extends BaseController {
         isset($oPessoa -> senhaPessoa) ? $arrayPessoas["senhaPessoa"] = $oPessoa -> senhaPessoa : $lRetorno = false;
         isset($oPessoa -> usuarioPessoa) ? $arrayPessoas["usuarioPessoa"] = $oPessoa -> usuarioPessoa : $lRetorno = false;
 
-/*         // Confere se login já está em uso
-        $this -> Model -> ConsultUsuario( $_POST["usuarioPessoa"] );
-        $arrayUsers = $this -> Model -> getConsult() -> fetch_assoc();
-        if( !empty( $arrayUsers ) ){
-            $this -> RespostaRuimHTTP(400,"já existe usuário com este nome de usuário informado!","Requisição Mal Feita",0);
-            exit;
-        } */
-
         if($lRetorno){
 
-            $this -> Model -> ConsultUsuarioEmail( $_POST["emailPessoa"] );
-            $arrayUsers = $this -> Model -> getConsult() -> fetch_assoc();
-            if( !empty( $arrayUsers ) ){
+            $this -> Model -> ConsultUsuarioEmail( $arrayPessoas["emailPessoa"] );
+            $arrayPessoas = $this -> Model -> getConsult() -> fetch_assoc();
+            if( !empty( $arrayPessoas ) ){
                 $this -> RespostaRuimHTTP(400,"já existe usuário com este e-mail informado!","Requisição Mal Feita",0);
                 exit;
             }
@@ -94,7 +86,80 @@ final class PessoasController extends BaseController {
             $this -> Model -> InsertPessoa($arrayPessoas);
             $idPessoa = $this -> Model -> GetConsult();
 
-            $this -> Parte2();
+                
+            // Gera nova senha provisória e cadastra o usuário
+            $novaSenha = $this -> gerar_senha( 6, true, true, true, true );
+            $arrayPessoas["nomePessoa"]      = mb_convert_case( $arrayPessoas["nomePessoa"],  MB_CASE_TITLE, 'UTF-8' );
+            $arrayPessoas["usuarioEmail"]     = $arrayPessoas["usuarioEmail"];
+            $arrayPessoas["usuarioCliente"]        = $arrayPessoas["usuarioCliente"];
+            $arrayPessoas["usuarioTelefoneCelular"]     = $arrayPessoas["usuarioTelefoneCelular"];
+            $arrayPessoas["usuarioNivel"]     = $arrayPessoas["usuarioNivel"];
+            $arrayPessoas["usuarioPessoa"]     = $arrayPessoas["usuarioPessoa"];
+            $arrayPessoas["usuarioSenha"]     = md5( $novaSenha );
+            $arrayPessoas["usuarioSenhaValidade"] = "null";
+
+            // Envia mensagem por e-Mail
+            $cMailCharSet = 'UTF-8';
+            $cMailHeaders = '';
+            $cMailOrigem = 'sac@monibus.tecnologia.ws';
+            $cMailNomeOrigem = 'SAC Monibus';
+            $cMailResposta = 'sac@monibus.tecnologia.ws';
+            $cMailNomeResposta = 'SAC Monibus';
+            $cMailDestino = $arrayPessoas["usuarioEmail"];
+            $cMailNomeDestino = $arrayPessoas["nomePessoa"];
+            $cMailAssunto = 'Seu usuário ' . $arrayPessoas["usuarioPessoa"] . ' foi criado com sucesso' ;
+            $cMailmensagem = '
+            <html lang="pt">
+                <meta charset="' . mb_strtolower($cMailCharSet) . '">
+                <meta name="author" content="Luiz Carlos Costa Rodrigues born in Santa Maria RS Brazil, www.dataprol.com.br">
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no">
+                <head>
+                    <title>Novo Usuário Monibus</title>
+                </head>
+                <body>
+                    <h1>Novo Usuário Monibus</h1>
+                    <h3>Seu cadastro foi concluído, com sucesso!</h3>
+                    <p>Nome: ' . $arrayPessoas["nomePessoa"] . '<br>
+                    Usuário: <b>' . $arrayPessoas["usuarioPessoa"] . '</b><br>
+                    Senha provisória: <b>' . $novaSenha . '</b><br>
+                    <br>
+                    <b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>
+                    </p>
+                    <br><br>
+                    Equipe Monibus
+                    <br>
+                    <a href="http://www.monibus.tecnologia.ws/">www.monibus.tecnologia.ws</a>
+                </body>
+            </html>
+            ';
+            
+            $this -> Mail -> setLanguage('br'); 
+            $this -> Mail -> CharSet='UTF-8'; 
+            //$this -> Mail -> SMTPDebug = SMTP::DEBUG_SERVER; 
+            $this -> Mail -> isSMTP(); 
+            $this -> Mail -> Host = _SisConfigGeral["email_servidor"]["hostname"]; 
+            $this -> Mail -> SMTPAuth = true; 
+            $this -> Mail -> Username = _SisConfigGeral["email_servidor"]["username"]; 
+            $this -> Mail -> Password = _SisConfigGeral["email_servidor"]["password"]; 
+            $this -> Mail -> SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+            $this -> Mail -> Port = 587; 
+            $this -> Mail -> From = $cMailOrigem; 
+            $this -> Mail -> FromName = $cMailNomeResposta; 
+            $this -> Mail -> addAddress($cMailDestino, $cMailNomeDestino); 
+            $this -> Mail -> addAddress('sac@monibus.tecnologia.ws'); 
+            $this -> Mail -> addReplyTo($cMailOrigem, $cMailNomeResposta);
+            //$this -> Mail -> addCC('cc@exemplo.com');
+            //$this -> Mail -> addBCC('bcc@exemplo.com');
+            $this -> Mail -> isHTML(true); 
+            $this -> Mail -> Subject = $cMailAssunto;
+            $this -> Mail -> Body    = $cMailmensagem;
+            $this -> Mail -> AltBody = strip_tags( $cMailmensagem );
+            
+            if( ! $this -> Mail -> send() ) 
+            {
+                // A mensagem não pode ser enviada   
+            }
+            
 
             header('Content-Type: application/json');
             $data['idPessoa'] = $idPessoa;
@@ -112,165 +177,6 @@ final class PessoasController extends BaseController {
 
     }
 
-    public function Parte2(){
-
-        // Gera nova senha provisória e cadastra o usuário
-        $novaSenha = $this -> gerar_senha( 6, true, true, true, true );
-        $prazoDias = 3;
-        $validadeSenha = new DateTime();
-        $prazoSenha = new DateInterval( "P" . $prazoDias . "D" );
-        $validadeSenha -> add( $prazoSenha );
-
-        $arrayUsers["usuarioNome"]      = mb_convert_case( $_POST["usuarioNome"],  MB_CASE_TITLE, 'UTF-8' );
-        $arrayUsers["usuarioEmail"]     = $_POST["usuarioEmail"];
-        $arrayUsers["usuarioCliente"]        = $_POST["usuarioCliente"];
-        $arrayUsers["usuarioTelefoneCelular"]     = $_POST["usuarioTelefoneCelular"];
-        $arrayUsers["usuarioNivel"]     = $_POST["usuarioNivel"];
-        $arrayUsers["usuarioLogin"]     = $_POST["usuarioLogin"];
-        $arrayUsers["usuarioSenha"]     = md5( $novaSenha );
-        $arrayUsers["usuarioSenhaValidade"] = $validadeSenha -> format( "Y-m-d" );
- 
-        //$this -> Model -> insertUser( $arrayUsers );
-        $this -> Model -> InsertPessoa( $arrayUsers );
-
-        $idUser = $this -> Model -> getConsult();
-
-        if( $idUser > 0 ){
-
-            $foto_temp = $_FILES["foto"]["tmp_name"]; //caminho temporário
-            $foto_nome = $_FILES["foto"]["name"]; //obtem o nome
-            $extensao = str_replace('.','',mb_strrchr($foto_nome,'.'));
-            $max_width = 600;
-            $max_height = 600;
-
-            $img = null;
-
-            // converte a imagem em JPG
-            if($extensao=='jpg'||$extensao=='jpeg'){
-                $img = @imagecreatefromjpeg($foto_temp);
-            }else if($extensao=='png'){
-                $img = @imagecreatefrompng($foto_temp);
-            }else if($extensao=='gif'){
-                $img = @imagecreatefromgif($foto_temp);
-            }else{
-                $img = @imagecreatefromjpeg($foto_temp);
-            }
-
-            // verifica tamanho da imagem
-            if($img){
-                $width = imagesx($img);
-                $height = imagesy($img);
-                $scale = min($max_width/$width,$max_height/$height);
-                // Se a é maior que o permitido
-                if($scale<1){
-                    $new_width = floor($scale*$width);
-                    $new_height = floor($scale*$height);
-                    // Cria imagem temporária
-                    $tmp_img = @imagecreatetruecolor($new_width,$new_height);
-                    // Copia e redimenciona imagem
-                    @imagecopyresampled($tmp_img,$img,0,0,0,0,$new_width,$new_height,$width,$height);
-                    @imagedestroy($img);
-                    $img = $tmp_img;
-                }
-            }
-
-            // cria imagem na pasta adequada
-            @imagejpeg( $img, $this->diretorios["arquivos"] . "/" . "users/" . $idUser . ".jpg" );
-        
-            // Envia mensagem por e-Mail
-            $cMailCharSet = 'UTF-8';
-            $cMailHeaders = '';
-            $cMailOrigem = 'sac@monibus.tecnologia.ws';
-            $cMailNomeOrigem = 'SAC Monibus';
-            $cMailResposta = 'sac@monibus.tecnologia.ws';
-            $cMailNomeResposta = 'SAC Monibus';
-            $cMailDestino = $arrayUsers["usuarioEmail"];
-            $cMailNomeDestino = $arrayUsers["usuarioNome"];
-            $cMailAssunto = 'Seu usuário ' . $arrayUsers["usuarioLogin"] . ' foi criado com sucesso' ;
-            $cMailmensagem = '
-            <html lang="pt">
-                <meta charset="' . mb_strtolower($cMailCharSet) . '">
-                <meta name="author" content="Luiz Carlos Costa Rodrigues born in Santa Maria RS Brazil, www.dataprol.com.br">
-                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no">
-                <head>
-                    <title>Novo Usuário Monibus</title>
-                </head>
-                <body>
-                    <h1>Novo Usuário Monibus</h1>
-                    <h3>Seu cadastro foi concluído, com sucesso!</h3>
-                    <p>Nome: ' . $arrayUsers["usuarioNome"] . '<br>
-                    Usuário: <b>' . $arrayUsers["usuarioLogin"] . '</b><br>
-                    Senha provisória: <b>' . $novaSenha . '</b><br>
-                    <b>
-                    Validade: ' . $prazoDias . ' dias</b>
-                    <br>
-                    Para trocar a senha, acesse <b><a href="http://monibus.tecnologia.ws/painel">Área do Cliente Monibus</a></b>, 
-                    entre com sua senha provisória, clique na sua imagem, no canto superior direito da tela, e clique em <b>Trocar Senha</b>.
-                    <br>
-                    <b>Troque sua senha, o quanto antes, para evitar seu bloqueio.</b>
-                    </p>
-                    <br><br>
-                    Luiz Carlos Costa Rodrigues - Monibus
-                    <br>
-                    <a href="http://www.monibus.tecnologia.ws/">www.monibus.tecnologia.ws</a>
-                </body>
-            </html>
-            ';
-            
-            $this -> Mail -> setLanguage('br');                             // Habilita as saídas de erro em Português
-            $this -> Mail -> CharSet='UTF-8';                               // Habilita o envio do email como 'UTF-8'
-            
-            //$this -> Mail -> SMTPDebug = SMTP::DEBUG_SERVER;                               // Habilita a saída do tipo "verbose"
-            
-            $this -> Mail -> isSMTP();                                      // Configura o disparo como SMTP
-            $this -> Mail -> Host = $Config['hostname'];                        // Especifica o enderço do servidor SMTP da Locaweb
-            $this -> Mail -> SMTPAuth = true;                               // Habilita a autenticação SMTP
-            $this -> Mail -> Username = $Config['username'];                        // Usuário do SMTP
-            $this -> Mail -> Password = $Config['password'];                          // Senha do SMTP
-            $this -> Mail -> SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;                            // Habilita criptografia TLS | 'ssl' também é possível
-            $this -> Mail -> Port = 587;                                    // Porta TCP para a conexão
-          
-            $this -> Mail -> From = $cMailOrigem;                          // Endereço previamente verificado no painel do SMTP
-            $this -> Mail -> FromName = $cMailNomeResposta;                     // Nome no remetente
-            $this -> Mail -> addAddress($cMailDestino, $cMailNomeDestino);// Acrescente um destinatário
-            $this -> Mail -> addAddress('sac@monibus.tecnologia.ws');                // O nome é opcional
-            $this -> Mail -> addReplyTo($cMailOrigem, $cMailNomeResposta);
-            //$this -> Mail -> addCC('cc@exemplo.com');
-            //$this -> Mail -> addBCC('bcc@exemplo.com');
-            
-            $this -> Mail -> isHTML(true);                                  // Configura o formato do email como HTML
-            
-            $this -> Mail -> Subject = $cMailAssunto;
-            $this -> Mail -> Body    = $cMailmensagem;
-            $this -> Mail -> AltBody = strip_tags( $cMailmensagem );
-            
-            if(!$this -> Mail -> send()) 
-            {
-
-                echo '<h2>A mensagem não pode ser enviada</h2>';
-                //echo 'Mensagem de erro: ' . $this -> Mail -> ErrorInfo;
-
-                require_once("views/users/Falhou.php");
-                exit;
-                return;
-                
-            }else{
-                
-                require_once("views/users/AvisoSenhaEnviada.php");
-                exit;
-                return;
-                
-            }
-                    
-        }else{
-
-            require_once("views/users/Falhou.php");
-            exit;
-            return;
-
-        }
-        
-    }
 
     //Exemplo retirado do website DevMedia
     function gerar_senha( $tamanho, $maiusculas, $minusculas, $numeros, $simbolos ){
@@ -318,7 +224,6 @@ final class PessoasController extends BaseController {
             $arrayPessoas["idPessoa"] = $idPessoa;
             $arrayPessoas["nomePessoa"] = $oPessoa -> nomePessoa;
             $arrayPessoas["emailPessoa"] = $oPessoa -> emailPessoa;
-            $arrayPessoas["senhaPessoa"] = $oPessoa -> senhaPessoa;
             $arrayPessoas["tipoPessoa"] = $oPessoa -> tipoPessoa;
             $this -> Model -> UpdatePessoa($arrayPessoas);
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
