@@ -7,6 +7,10 @@ final class CarrosController extends BaseController {
 		require_once("models/CarrosModel.php");
         $this -> Model = new CarrosModel();
 		
+        require_once("controllers/UsuariosController.php");
+        $this -> Usuario = new UsuariosController();
+        $this -> Usuario -> ValidateTokenAction();
+
     }
 
     public function ListThis(){

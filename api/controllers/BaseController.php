@@ -68,7 +68,7 @@ class BaseController{
 
     }
 
-    public function RespostaBoaHTTP($nCodigoHTTP,$arrayItens){
+    public function RespostaBoaHTTP($nCodigoHTTP,$dataInfo){
 
         $pagination['page'] = $this -> nPagina;
         $pagination['pagesTotal'] = $this -> nTotalPaginas;
@@ -76,7 +76,13 @@ class BaseController{
         $pagination['itemsTotal'] = $this -> nTotalItens;
         $retornoHASH['success'] = "true";
         $retornoHASH['pagination'] = $pagination;
-        $retornoHASH['data'] = $arrayItens;
+        if( ! is_null($dataInfo) ){
+            if( is_string($dataInfo) ){
+                $retornoHASH['message'] = $dataInfo;
+            }else{
+                $retornoHASH['data'] = $dataInfo;
+            }
+        }
         $retornoJSON = json_encode( $retornoHASH );
         header( 'Content-Type: application/json' );
         if($retornoJSON){

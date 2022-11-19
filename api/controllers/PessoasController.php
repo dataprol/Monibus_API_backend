@@ -15,11 +15,9 @@ final class PessoasController extends BaseController {
 		require_once("models/PessoasModel.php");
         $this -> Model = new PessoasModel();
 
-        if( ! isset( $_SESSION[ "usuarioLogin" ] ) ){
-			header("Location: usuarios/vlogin");exit;
-		}else{
-			header("Location: usuarios/vtoken");exit;
-		}
+		require_once("controllers/UsuariosController.php");
+        $this -> Usuario = new UsuariosController();
+        $this -> Usuario -> ValidateTokenAction();
 
         require_once('Utils/PHPMailer/src/Exception.php');
         require_once('Utils/PHPMailer/src/SMTP.php');
@@ -67,36 +65,67 @@ final class PessoasController extends BaseController {
 		
         $lRetorno = true;
         $oPessoa = json_decode( file_get_contents("php://input") );
-        isset($oPessoa -> nomePessoa) ? $arrayPessoas["nomePessoa"] = $oPessoa -> nomePessoa : $lRetorno = false;
-        isset($oPessoa -> identidadePessoa) ? $arrayPessoas["identidadePessoa"] = $oPessoa -> identidadePessoa : $lRetorno = false;
-        isset($oPessoa -> emailPessoa) ? $arrayPessoas["emailPessoa"] = $oPessoa -> emailPessoa : $lRetorno = false;
-        isset($oPessoa -> tipoPessoa) ? $arrayPessoas["tipoPessoa"] = $oPessoa -> tipoPessoa : $lRetorno = false;
-        isset($oPessoa -> senhaPessoa) ? $arrayPessoas["senhaPessoa"] = $oPessoa -> senhaPessoa : $lRetorno = false;
-        isset($oPessoa -> usuarioPessoa) ? $arrayPessoas["usuarioPessoa"] = $oPessoa -> usuarioPessoa : $lRetorno = false;
+        isset($oPessoa -> nomePessoa) ? $arrayPessoa["nomePessoa"] = $oPessoa -> nomePessoa : $lRetorno = false;
+        isset($oPessoa -> identidadePessoa) ? $arrayPessoa["identidadePessoa"] = $oPessoa -> identidadePessoa : $lRetorno = false;
+        isset($oPessoa -> emailPessoa) ? $arrayPessoa["emailPessoa"] = $oPessoa -> emailPessoa : $lRetorno = false;
+        isset($oPessoa -> tipoPessoa) ? $arrayPessoa["tipoPessoa"] = $oPessoa -> tipoPessoa : $lRetorno = false;
+        isset($oPessoa -> usuarioPessoa) ? $arrayPessoa["usuarioPessoa"] = $oPessoa -> usuarioPessoa : $lRetorno = false;
 
+        isset($oPessoa -> dataNascimentoPessoa) ? $arrayPessoa["dataNascimentoPessoa"] = $oPessoa -> dataNascimentoPessoa : null;
+        isset($oPessoa -> telefone1Pessoa) ? $arrayPessoa["telefone1Pessoa"] = $oPessoa -> telefone1Pessoa : null;
+        isset($oPessoa -> enderecoLogradouroPessoa) ? $arrayPessoa["enderecoLogradouroPessoa"] = $oPessoa -> enderecoLogradouroPessoa : null;
+        isset($oPessoa -> enderecoNumeroPessoa) ? $arrayPessoa["enderecoNumeroPessoa"] = $oPessoa -> enderecoNumeroPessoa : null;
+        isset($oPessoa -> enderecoBairroPessoa) ? $arrayPessoa["enderecoBairroPessoa"] = $oPessoa -> enderecoBairroPessoa : null;
+        isset($oPessoa -> enderecoMunicipioPessoa) ? $arrayPessoa["enderecoMunicipioPessoa"] = $oPessoa -> enderecoMunicipioPessoa : null;
+        isset($oPessoa -> enderecoUFPessoa) ? $arrayPessoa["enderecoUFPessoa"] = $oPessoa -> enderecoUFPessoa : null;
+        isset($oPessoa -> enderecoCEPPessoa) ? $arrayPessoa["enderecoCEPPessoa"] = $oPessoa -> enderecoCEPPessoa : null;
+        isset($oPessoa -> enderecoIBGEPessoa) ? $arrayPessoa["enderecoIBGEPessoa"] = $oPessoa -> enderecoIBGEPessoa : null;
+        isset($oPessoa -> enderecoSIAFIPessoa) ? $arrayPessoa["enderecoSIAFIPessoa"] = $oPessoa -> enderecoSIAFIPessoa : null;
+        isset($oPessoa -> enderecoGIAPessoa) ? $arrayPessoa["enderecoGIAPessoa"] = $oPessoa -> enderecoGIAPessoa : null;
+        
         if($lRetorno){
 
-            $this -> Model -> ConsultUsuarioEmail( $arrayPessoas["emailPessoa"] );
-            $arrayPessoas = $this -> Model -> getConsult() -> fetch_assoc();
-            if( !empty( $arrayPessoas ) ){
-                $this -> RespostaRuimHTTP(400,"já existe usuário com este e-mail informado!","Requisição Mal Feita",0);
+            // Gera nova senha provisória e cadastra o usuário
+            $senhaDescripto = $this -> gerar_senha( 6, true, true, true, true );
+            $arrayPessoa["senhaPessoa"] = md5( $senhaDescripto );
+            $arrayPessoa["nomePessoa"] = mb_convert_case( $arrayPessoa["nomePessoa"],  MB_CASE_TITLE, 'UTF-8' );
+
+            $this -> Model -> InsertPessoa($arrayPessoa);
+            $idPessoa = $this -> Model -> GetConsult();
+            
+            // Inspeciona erro retornado em caso de duplicidade detectada
+            if( $this -> Model -> Conn -> errno == 1062 ){
+                $msgerro = $this -> Model -> Conn -> error;
+                if (!empty($msgerro)) { 
+                    $cMensagemErro = $msgerro;
+                    $lpos = strpos($msgerro, "'"); 
+                    if ($lpos !== false) { 
+                        $msgerro = substr($msgerro, $lpos + 1);
+                        $npos = strpos($msgerro, "'");
+                        $valorDuplicado = substr($msgerro, 0, $npos);
+                        $msgerro = substr($msgerro, $npos + 1);
+                    } 
+                    $lpos = strpos($msgerro, "."); 
+                    if ($lpos !== false) { 
+                        $msgerro = substr($msgerro, $lpos + 1);
+                        $npos = strpos($msgerro, "'");
+                        $indiceValorDuplicado = substr($msgerro, 0, $npos);
+                    }
+                    $msgerro = $cMensagemErro;
+                    if($indiceValorDuplicado == 'emailPessoa_UNIQUE'){
+                        $cMensagemErro = "O e-mail $valorDuplicado";
+                    }
+                    if($indiceValorDuplicado == 'identidadePessoa_UNIQUE'){
+                        $cMensagemErro = "A identidade $valorDuplicado";
+                    }
+                    if($indiceValorDuplicado == 'usuarioPessoa_UNIQUE'){
+                        $cMensagemErro = "O nome de usuário $valorDuplicado";
+                    }
+                    $cMensagemErro .= " já existe no cadastro de outra pessoa!";
+                }
+                $this -> RespostaRuimHTTP(400,$cMensagemErro,"Requisição Mal Feita",0);
                 exit;
             }
-
-            $this -> Model -> InsertPessoa($arrayPessoas);
-            $idPessoa = $this -> Model -> GetConsult();
-
-                
-            // Gera nova senha provisória e cadastra o usuário
-            $novaSenha = $this -> gerar_senha( 6, true, true, true, true );
-            $arrayPessoas["nomePessoa"]      = mb_convert_case( $arrayPessoas["nomePessoa"],  MB_CASE_TITLE, 'UTF-8' );
-            $arrayPessoas["usuarioEmail"]     = $arrayPessoas["usuarioEmail"];
-            $arrayPessoas["usuarioCliente"]        = $arrayPessoas["usuarioCliente"];
-            $arrayPessoas["usuarioTelefoneCelular"]     = $arrayPessoas["usuarioTelefoneCelular"];
-            $arrayPessoas["usuarioNivel"]     = $arrayPessoas["usuarioNivel"];
-            $arrayPessoas["usuarioPessoa"]     = $arrayPessoas["usuarioPessoa"];
-            $arrayPessoas["usuarioSenha"]     = md5( $novaSenha );
-            $arrayPessoas["usuarioSenhaValidade"] = "null";
 
             // Envia mensagem por e-Mail
             $cMailCharSet = 'UTF-8';
@@ -105,9 +134,9 @@ final class PessoasController extends BaseController {
             $cMailNomeOrigem = 'SAC Monibus';
             $cMailResposta = 'sac@monibus.tecnologia.ws';
             $cMailNomeResposta = 'SAC Monibus';
-            $cMailDestino = $arrayPessoas["usuarioEmail"];
-            $cMailNomeDestino = $arrayPessoas["nomePessoa"];
-            $cMailAssunto = 'Seu usuário ' . $arrayPessoas["usuarioPessoa"] . ' foi criado com sucesso' ;
+            $cMailDestino = $arrayPessoa["emailPessoa"];
+            $cMailNomeDestino = $arrayPessoa["nomePessoa"];
+            $cMailAssunto = 'Seu usuário ' . $arrayPessoa["usuarioPessoa"] . ' foi criado com sucesso' ;
             $cMailmensagem = '
             <html lang="pt">
                 <meta charset="' . mb_strtolower($cMailCharSet) . '">
@@ -119,9 +148,9 @@ final class PessoasController extends BaseController {
                 <body>
                     <h1>Novo Usuário Monibus</h1>
                     <h3>Seu cadastro foi concluído, com sucesso!</h3>
-                    <p>Nome: ' . $arrayPessoas["nomePessoa"] . '<br>
-                    Usuário: <b>' . $arrayPessoas["usuarioPessoa"] . '</b><br>
-                    Senha provisória: <b>' . $novaSenha . '</b><br>
+                    <p>Nome: ' . $arrayPessoa["nomePessoa"] . '<br>
+                    Usuário: <b>' . $arrayPessoa["usuarioPessoa"] . '</b><br>
+                    Senha provisória: <b>' . $senhaDescripto . '</b><br>
                     <br>
                     <b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>
                     </p>
@@ -144,9 +173,9 @@ final class PessoasController extends BaseController {
             $this -> Mail -> SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
             $this -> Mail -> Port = 587; 
             $this -> Mail -> From = $cMailOrigem; 
-            $this -> Mail -> FromName = $cMailNomeResposta; 
+            $this -> Mail -> FromName = $cMailNomeOrigem; 
             $this -> Mail -> addAddress($cMailDestino, $cMailNomeDestino); 
-            $this -> Mail -> addAddress('sac@monibus.tecnologia.ws'); 
+            $this -> Mail -> addAddress($cMailResposta); 
             $this -> Mail -> addReplyTo($cMailOrigem, $cMailNomeResposta);
             //$this -> Mail -> addCC('cc@exemplo.com');
             //$this -> Mail -> addBCC('bcc@exemplo.com');
@@ -221,11 +250,11 @@ final class PessoasController extends BaseController {
 		}
         
         if( !empty($idPessoa)){
-            $arrayPessoas["idPessoa"] = $idPessoa;
-            $arrayPessoas["nomePessoa"] = $oPessoa -> nomePessoa;
-            $arrayPessoas["emailPessoa"] = $oPessoa -> emailPessoa;
-            $arrayPessoas["tipoPessoa"] = $oPessoa -> tipoPessoa;
-            $this -> Model -> UpdatePessoa($arrayPessoas);
+            $arrayPessoa["idPessoa"] = $idPessoa;
+            $arrayPessoa["nomePessoa"] = $oPessoa -> nomePessoa;
+            $arrayPessoa["emailPessoa"] = $oPessoa -> emailPessoa;
+            $arrayPessoa["tipoPessoa"] = $oPessoa -> tipoPessoa;
+            $this -> Model -> UpdatePessoa($arrayPessoa);
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             header('Content-Type: application/json');
             echo json_encode($retorno);

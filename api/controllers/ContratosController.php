@@ -7,6 +7,10 @@ final class ContratosController extends BaseController {
 		require_once("models/ContratosModel.php");
         $this -> Model = new ContratosModel();
 		
+		require_once("controllers/UsuariosController.php");
+        $this -> Usuario = new UsuariosController();
+        $this -> Usuario -> ValidateTokenAction();
+
     }
 
     public function ListThis(){

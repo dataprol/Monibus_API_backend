@@ -7,6 +7,10 @@ final class TurnosController extends BaseController {
 		require_once("models/TurnosModel.php");
         $this -> Model = new TurnosModel();
 		
+		require_once("controllers/UsuariosController.php");
+        $this -> Usuario = new UsuariosController();
+        $this -> Usuario -> ValidateTokenAction();
+
     }
 
     public function ListThis(){

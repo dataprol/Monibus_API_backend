@@ -7,6 +7,10 @@ final class LinhasController extends BaseController {
 		require_once("models/LinhasModel.php");
         $this -> Model = new LinhasModel();
 		
+		require_once("controllers/UsuariosController.php");
+        $this -> Usuario = new UsuariosController();
+        $this -> Usuario -> ValidateTokenAction();
+
     }
 
     public function ListThis(){

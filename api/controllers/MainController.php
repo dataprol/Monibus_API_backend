@@ -3,9 +3,9 @@
     class MainController{
 
         public function Index(){
-            if( !isset($_SESSION["usuarioLogin"]) ){
-				header("Location: main/login");
-            }
+            require_once("controllers/UsuariosController.php");
+            $this -> Usuario = new UsuariosController();
+            $this -> Usuario -> ValidateTokenAction();
         }
         
         public function Login(){

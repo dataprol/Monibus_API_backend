@@ -7,11 +7,10 @@ final class EmpresasController extends BaseController {
 		require_once("models/EmpresasModel.php");
         $this -> Model = new EmpresasModel();
 
-        if( ! isset( $_SESSION[ "usuarioLogin" ] ) ){
-			header("Location: usuarios/vlogin");exit;
-		}else{
-			header("Location: usuarios/vtoken");
-		}		
+		require_once("controllers/UsuariosController.php");
+        $this -> Usuario = new UsuariosController();
+        $this -> Usuario -> ValidateTokenAction();
+
     }
 
     public function ListThis(){

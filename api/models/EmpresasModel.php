@@ -17,7 +17,7 @@ final class EmpresasModel{
     public function CountRows($nidrelacionamento){
         
         $sql = "SELECT COUNT(*) as total_linhas FROM empresas";
-        if( $nidrelacionamento != null ){
+        if( ! is_null($nidrelacionamento) ){
             $sql .= ", pessoas_tem_empresas";
             $sql .= " WHERE pessoas_tem_empresas.idPessoa = $nidrelacionamento";
             $sql .= " and empresas.idEmpresa = pessoas_tem_empresas.idPessoa";

@@ -14,24 +14,25 @@ final class PessoasModel{
 
     }
 
-    public function CountRows($nidrelacionamento){
+    public function CountRows($nIdRelacionamento){
         
         $sql = "SELECT COUNT(*) as total_linhas FROM pessoas";
-        if( $nidrelacionamento != null ){
+        if( ! is_null($nIdRelacionamento) ){
             $sql .= ", responsaveis_tem_dependentes";
-            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $nidrelacionamento";
+            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $nIdRelacionamento";
             $sql .= " and pessoas.idPessoa = responsaveis_tem_dependentes.idDependente";
         }
         $this -> resultado = $this -> Conn -> query( $sql );
 
     }
 
-    public function ListThis( $nComecarPor, $nItensPorPagina, $nidrelacionamento ){
-
-        $sql = "SELECT idPessoa, nomePessoa, emailPessoa, usuarioPessoa";
-        if( $nidrelacionamento != null ){
+    public function ListThis( $nComecarPor, $nItensPorPagina, $nIdRelacionamento ){
+        
+        $colunas = "*";
+        $sql = "SELECT $colunas";
+        if( ! is_null($nIdRelacionamento) ){
             $sql .= ", responsaveis_tem_dependentes";
-            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $nidrelacionamento";
+            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $nIdRelacionamento";
             $sql .= " and pessoas.idPessoa = responsaveis_tem_dependentes.idDependente";
         }
         $sql .= " FROM pessoas";
@@ -50,24 +51,46 @@ final class PessoasModel{
 
     }
 
-    public function InsertPessoa($arraypessoas){
+    public function InsertPessoa($arrayPessoa){
 
         $sql = "INSERT INTO pessoas(
                 `nomePessoa`,
                 `identidadePessoa`,
                 `emailPessoa`,
                 `tipoPessoa`,
-                `senhaPessoa`,
                 `usuarioPessoa`,
-                `dataCadastroPessoa`) 
+                `senhaPessoa`,
+                `dataNascimentoPessoa`,
+                `dataCadastroPessoa`,
+                `telefone1Pessoa`,
+                `enderecoLogradouroPessoa`,
+                `enderecoNumeroPessoa`,
+                `enderecoBairroPessoa`,
+                `enderecoMunicipioPessoa`,
+                `enderecoUFPessoa`,
+                `enderecoCEPPessoa`,
+                `enderecoIBGEPessoa`,
+                `enderecoSIAFIPessoa`,
+                `enderecoGIAPessoa` ) 
                 VALUE(
-                    '" . $arraypessoas['nomePessoa'] . "', 
-                    '" . $arraypessoas['identidadePessoa'] . "', 
-                    '" . $arraypessoas['emailPessoa'] . "', 
-                    '" . $arraypessoas['tipoPessoa'] . "', 
-                    '" . md5($arraypessoas['senhaPessoa']) . "', 
-                    '" . $arraypessoas['usuarioPessoa'] . "', 
-                    now()
+                    '" . $arrayPessoa["nomePessoa"] . "', 
+                    '" . $arrayPessoa['identidadePessoa'] . "', 
+                    '" . $arrayPessoa['emailPessoa'] . "', 
+                    '" . $arrayPessoa['tipoPessoa'] . "', 
+                    '" . $arrayPessoa['usuarioPessoa'] . "', 
+                    '" . $arrayPessoa['senhaPessoa'] . "', 
+                    '" . $arrayPessoa['dataNascimentoPessoa'] . "',
+                    now(), 
+                    '" . $arrayPessoa['telefone1Pessoa'] . "', 
+                    '" . $arrayPessoa['enderecoLogradouroPessoa'] . "', 
+                    '" . $arrayPessoa['enderecoNumeroPessoa'] . "', 
+                    '" . $arrayPessoa['enderecoBairroPessoa'] . "', 
+                    '" . $arrayPessoa['enderecoMunicipioPessoa'] . "', 
+                    '" . $arrayPessoa['enderecoUFPessoa'] . "', 
+                    '" . $arrayPessoa['enderecoCEPPessoa'] . "', 
+                    '" . $arrayPessoa['enderecoIBGEPessoa'] . "', 
+                    '" . $arrayPessoa['enderecoSIAFIPessoa'] . "', 
+                    '" . $arrayPessoa['enderecoGIAPessoa'] . "'
                     );";
 
         $this -> Conn -> query($sql);
@@ -75,14 +98,14 @@ final class PessoasModel{
 
     }
 
-    public function UpdatePessoa($arraypessoas){
+    public function UpdatePessoa($arrayPessoa){
 
         $sql = "UPDATE pessoas 
-            SET nomePessoa='" . $arraypessoas['nomePessoa'] . "'
-                ,emailPessoa='" . $arraypessoas['emailPessoa'] . "'
-                ,identidadePessoa='" . $arraypessoas['identidadePessoa'] . "'
-                ,tipoPessoa='" . $arraypessoas['tipoPessoa'] . "' 
-            WHERE idPessoa=" . $arraypessoas['idPessoa'] . ";" ;
+            SET nomePessoa='" . $arrayPessoa['nomePessoa'] . "'
+                ,emailPessoa='" . $arrayPessoa['emailPessoa'] . "'
+                ,identidadePessoa='" . $arrayPessoa['identidadePessoa'] . "'
+                ,tipoPessoa='" . $arrayPessoa['tipoPessoa'] . "' 
+            WHERE idPessoa=" . $arrayPessoa['idPessoa'] . ";" ;
 
         $this -> resultado = $this -> Conn -> query($sql);
 
@@ -108,10 +131,10 @@ final class PessoasModel{
 
     }
 
-    public function ConsultUsuarioEmail( $usuarioEmail ){
+    public function ConsultUsuarioEmail( $emailPessoa ){
         
-        $sql = "SELECT * FROM users 
-                WHERE usuarioEmail='" . $usuarioEmail . "'";
+        $sql = "SELECT * FROM pessoas 
+                WHERE emailPessoa='$emailPessoa'";
         $this -> resultado = $this -> Conn -> query( $sql );
 
     }
