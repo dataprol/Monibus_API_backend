@@ -135,7 +135,7 @@
 							break;
 
 						case 'POST':
-							$EmpresaCTRL -> InsertEmpresa();
+							$EmpresaCTRL -> InsertEmpresa(null);
 							break;
 
 						case 'PUT':

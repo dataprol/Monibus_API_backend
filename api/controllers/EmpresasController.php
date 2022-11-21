@@ -2,6 +2,8 @@
 //namespace Controlllers;
 final class EmpresasController extends BaseController {
    
+    var $Model;
+    
     function __construct(){
 		
 		require_once("models/EmpresasModel.php");
@@ -48,27 +50,81 @@ final class EmpresasController extends BaseController {
 		
 	}
 
-    public function InsertEmpresa(){
+    public function InsertEmpresa( $ObjEmpresa ){
 		
-        $oEmpresa = json_decode( file_get_contents("php://input") );
+        $lRetorno = true;
+        if( ! isset($ObjEmpresa) ){
+            $ObjEmpresa = json_decode( file_get_contents("php://input") );
+        }
+        $aEmpresa["nomeEmpresa"] = isset($ObjEmpresa -> nomeEmpresa) ? $ObjEmpresa -> nomeEmpresa : $lRetorno = false;
+        $aEmpresa["identidadeEmpresa"] = isset($ObjEmpresa -> identidadeEmpresa) ? $ObjEmpresa -> identidadeEmpresa : $lRetorno = false;
+        $aEmpresa["emailEmpresa"] = isset($ObjEmpresa -> emailEmpresa) ? $ObjEmpresa -> emailEmpresa : $lRetorno = false;
+        $aEmpresa["telefoneEmpresa"] = isset($ObjEmpresa -> telefoneEmpresa) ? $ObjEmpresa -> telefoneEmpresa : null;
+        $aEmpresa["idPessoa"] = isset($ObjEmpresa -> idPessoa) ? $ObjEmpresa -> idPessoa : $lRetorno = false;
+        $aEmpresa["tipoPessoa"] = isset($ObjEmpresa -> tipoPessoa) ? $ObjEmpresa -> tipoPessoa : $lRetorno = false;
 
-        $arrayEmpresas["nomeEmpresa"] = $oEmpresa -> nomeEmpresa;
-        $arrayEmpresas["identidadeEmpresa"] = $oEmpresa -> identidadeEmpresa;
-        $arrayEmpresas["emailEmpresa"]  = $oEmpresa -> emailEmpresa;
-        $arrayEmpresas["telefoneEmpresa"] = $oEmpresa -> telefoneEmpresa;
-        /* será que o objeto oEmpresa não pode 
-        ser repassado à Model, ao invés de 
-        armazenar cada valor na matriz arrayEmpresas? */
+        if($lRetorno){
+            
+            $this -> Model -> InsertEmpresa($aEmpresa);
+            $nIdEmpresa = $this -> Model -> GetConsult();
 
-        $this -> Model -> InsertEmpresa($arrayEmpresas);
-        $idEmpresa = $this -> Model -> GetConsult();
+            if( $nIdEmpresa > 0 ){
+                
+                $data['idEmpresa'] = strval($nIdEmpresa);
+                $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+                $retorno['data'] = $data;
+                header('Content-Type: application/json');
+                echo json_encode($retorno);
+                http_response_code(201);
+                
+                return $nIdEmpresa;
+            
+            }else{
 
-        $data['idEmpresa'] = strval($idEmpresa);
-        $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
-        $retorno['data'] = $data;
-        header('Content-Type: application/json');
-        echo json_encode($retorno);
-        http_response_code(201);
+                $cMensagemErro = "Sintaxe da empresa incorreta!";
+
+                // Em caso de duplicidade detectada, retornar mensagem apropriada.
+                if( $this -> Model -> Conn -> errno == 1062 ){
+                    $msgerro = $this -> Model -> Conn -> error;
+                    if (!empty($msgerro)) { 
+                        $cMensagemErro = $msgerro;
+                        $lpos = strpos($msgerro, "'"); 
+                        if ($lpos !== false) { 
+                            $msgerro = substr($msgerro, $lpos + 1);
+                            $npos = strpos($msgerro, "'");
+                            $valorDuplicado = substr($msgerro, 0, $npos);
+                            $msgerro = substr($msgerro, $npos + 1);
+                        } 
+                        $lpos = strpos($msgerro, "."); 
+                        if ($lpos !== false) { 
+                            $msgerro = substr($msgerro, $lpos + 1);
+                            $npos = strpos($msgerro, "'");
+                            $indiceValorDuplicado = substr($msgerro, 0, $npos);
+                        }
+                        $msgerro = $cMensagemErro;
+                        if($indiceValorDuplicado == 'emailEmpresa_UNIQUE'){
+                            $cMensagemErro = "O e-mail $valorDuplicado";
+                        }
+                        if($indiceValorDuplicado == 'identidadeEmpresa_UNIQUE'){
+                            $cMensagemErro = "A identidade $valorDuplicado";
+                        }
+                        $cMensagemErro .= " já existe no cadastro de outra empresa!";
+                    }
+                }
+                
+                $this -> RespostaRuimHTTP(400,$cMensagemErro,"Requisição Mal Feita",0);
+                exit;
+
+            }
+
+        }else{
+
+            $this -> RespostaRuimHTTP(400,"Sintaxe incorreta da empresa!","Requisição Mal Feita",0);
+            exit;
+            
+        }
+        
+        
 
     }
 

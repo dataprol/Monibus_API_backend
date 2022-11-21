@@ -52,21 +52,48 @@ final class EmpresasModel{
 
     public function InsertEmpresa($arrayempresas){
 
-        $sql = "INSERT INTO empresas(
-                `nomeEmpresa`,
-                `identidadeEmpresa`,
-                `emailEmpresa`,
-                `telefoneEmpresa`,
-                `dataCadastroEmpresa`) 
+/*         $sql = "set @idEmpresa = 0;
+                Call Cadastra_Empresa( '" . $arrayempresas['nomeEmpresa'] . "'
+                    ,'" . $arrayempresas['identidadeEmpresa'] . "'
+                    ,'" . $arrayempresas['emailEmpresa'] . "'
+                    ,'" . $arrayempresas['telefoneEmpresa'] . "'
+                    ," . $arrayempresas['idPessoa'] . "
+                    ,'" . $arrayempresas['tipoPessoa'] . "'
+                    @idEmpresa);
+                select @idEmpresa;";
+
+        $this -> resultado = $this -> Conn -> query($sql); */
+        
+        $sql = "INSERT INTO empresas( `nomeEmpresa`
+                                    ,`identidadeEmpresa`
+                                    ,`emailEmpresa`
+                                    ,`telefoneEmpresa`) 
                 VALUE('" . $arrayempresas['nomeEmpresa'] . "'
                     ,'" . $arrayempresas['identidadeEmpresa'] . "'
                     ,'" . $arrayempresas['emailEmpresa'] . "'
                     ,'" . $arrayempresas['telefoneEmpresa'] . "'
-                    ,now()
                     );";
-
+                    
         $this -> Conn -> query($sql);
         $this -> resultado = $this -> Conn -> insert_id;
+        
+        if( $this -> resultado > 0 ){
+            
+            $idEmpresa =  $this -> resultado;
+            $sql = "INSERT INTO pessoas_tem_empresas( `idEmpresa`
+                                        ,`idPessoa`
+                                        ,`tipoPessoa`
+                                        ) 
+                    VALUE(" . $idEmpresa . "
+                        ," . $arrayempresas['idPessoa'] . "
+                        ,'" . $arrayempresas['tipoPessoa'] . "'
+                        );";
+
+            if( ! $this -> Conn -> query($sql) ){
+                $this -> resultado = 0;
+            }
+
+        }
 
     }
 
