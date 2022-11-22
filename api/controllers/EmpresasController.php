@@ -103,10 +103,10 @@ final class EmpresasController extends BaseController {
                         }
                         $msgerro = $cMensagemErro;
                         if($indiceValorDuplicado == 'emailEmpresa_UNIQUE'){
-                            $cMensagemErro = "O e-mail $valorDuplicado";
+                            $cMensagemErro = "E-mail $valorDuplicado";
                         }
                         if($indiceValorDuplicado == 'identidadeEmpresa_UNIQUE'){
-                            $cMensagemErro = "A identidade $valorDuplicado";
+                            $cMensagemErro = "Identidade $valorDuplicado";
                         }
                         $cMensagemErro .= " já existe no cadastro de outra empresa!";
                     }

@@ -206,15 +206,15 @@ final class PessoasController extends BaseController {
                         }
                         $msgerro = $cMensagemErro;
                         if($indiceValorDuplicado == 'emailPessoa_UNIQUE'){
-                            $cMensagemErro = "O e-mail $valorDuplicado";
+                            $cMensagemErro = "E-mail $valorDuplicado";
                         }
                         if($indiceValorDuplicado == 'identidadePessoa_UNIQUE'){
-                            $cMensagemErro = "A identidade $valorDuplicado";
+                            $cMensagemErro = "Identidade $valorDuplicado";
                         }
                         if($indiceValorDuplicado == 'usuarioPessoa_UNIQUE'){
-                            $cMensagemErro = "O nome de usuário $valorDuplicado";
+                            $cMensagemErro = "Nome de usuário $valorDuplicado";
                         }
-                        $cMensagemErro .= " já existe no cadastro de outra pessoa!";
+                        $cMensagemErro .= " já existente no cadastro de outra pessoa!";
                     }
                 }
                 
