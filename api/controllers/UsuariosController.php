@@ -4,12 +4,13 @@ class UsuariosController extends BaseController{
 	
 	var $Model;
 	var $SenhaToken;
+	var $responseToken;
 
 	function __construct(){
 
         require_once("models/UsuariosModel.php");
         $this -> Model = new UsuariosModel();
-		$this -> SenhaToken = 'Monibus%$#@!LuizCarlosDataprol19772022';
+		$this -> SenhaToken = _SenhaToken;
 
 	}
 
@@ -22,7 +23,7 @@ class UsuariosController extends BaseController{
 	public function ValidateToken(){
 		
 		if( $this -> ValidateTokenAction() ){
-			$this -> RespostaBoaHTTP(200,"Token validado!");
+			$this -> RespostaBoaHTTP(200,"Token validado! " . $this->responseToken);
 		}
 
 	}
@@ -49,10 +50,10 @@ class UsuariosController extends BaseController{
 				$this -> RespostaRuimHTTP(400,"Token não reconhecido! ".$th->getMessage(),"Requisição Mal Feita",0);
 				exit;
 			}
-			$valid = hash_hmac('sha256',"$header.$payload",$this -> SenhaToken,true);
-			$valid = base64_encode($valid);
-			$valid = str_replace(['+', '/', '='], ['-', '_', ''], $valid);
-			if($signature != $valid){
+			$valid1 = hash_hmac('sha256',"$header.$payload",$this -> SenhaToken,true);
+			$valid2 = base64_encode($valid1);
+			$valid3 = str_replace(['+', '/', '='], ['-', '_', ''], $valid2);
+			if($signature != $valid3){
 
 				$this -> RespostaRuimHTTP(400,"Token inválido!","Requisição Mal Feita",0);
 				exit;
@@ -72,6 +73,7 @@ class UsuariosController extends BaseController{
 				}
 			}
 			$lRetorno = true;
+			var_dump( base64_decode( $valid1 ) );
 		}else{
 			$_SESSION['usuarioSituacao'] = "erro";
 			sleep($_SESSION['usuarioErroEsperar']);

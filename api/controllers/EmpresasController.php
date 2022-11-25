@@ -111,7 +111,7 @@ final class EmpresasController extends BaseController {
                         $cMensagemErro .= " já existe no cadastro de outra empresa!";
                     }
                 }
-                
+
                 $this -> RespostaRuimHTTP(400,$cMensagemErro,"Requisição Mal Feita",0);
                 exit;
 
@@ -121,10 +121,8 @@ final class EmpresasController extends BaseController {
 
             $this -> RespostaRuimHTTP(400,"Sintaxe incorreta da empresa!","Requisição Mal Feita",0);
             exit;
-            
+
         }
-        
-        
 
     }
 

@@ -51,18 +51,6 @@ final class EmpresasModel{
     }
 
     public function InsertEmpresa($arrayempresas){
-
-/*         $sql = "set @idEmpresa = 0;
-                Call Cadastra_Empresa( '" . $arrayempresas['nomeEmpresa'] . "'
-                    ,'" . $arrayempresas['identidadeEmpresa'] . "'
-                    ,'" . $arrayempresas['emailEmpresa'] . "'
-                    ,'" . $arrayempresas['telefoneEmpresa'] . "'
-                    ," . $arrayempresas['idPessoa'] . "
-                    ,'" . $arrayempresas['tipoPessoa'] . "'
-                    @idEmpresa);
-                select @idEmpresa;";
-
-        $this -> resultado = $this -> Conn -> query($sql); */
         
         $sql = "INSERT INTO empresas( `nomeEmpresa`
                                     ,`identidadeEmpresa`
