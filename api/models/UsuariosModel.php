@@ -22,6 +22,14 @@ class UsuariosModel{
 
     }
     
+    public function consultaUsuarioId( $userId ){
+
+        $sql = "SELECT * FROM pessoas 
+                WHERE idPessoa='$userId'";
+        $this -> resultado = $this -> Conn -> query( $sql );
+
+    }
+    
     public function consultaUsuariosSession( $sessionId ){
         
         $sql = "SELECT * FROM pessoas 

@@ -3,14 +3,14 @@
 class UsuariosController extends BaseController{
 	
 	var $Model;
-	var $SenhaToken;
-	var $responseToken;
+	var $token;
+	var $tokenPayload;
+	var $dados;
 
 	function __construct(){
 
         require_once("models/UsuariosModel.php");
         $this -> Model = new UsuariosModel();
-		$this -> SenhaToken = _SenhaToken;
 
 	}
 
@@ -23,7 +23,8 @@ class UsuariosController extends BaseController{
 	public function ValidateToken(){
 		
 		if( $this -> ValidateTokenAction() ){
-			$this -> RespostaBoaHTTP(200,"Token validado! " . $this->responseToken);
+			$this -> RespostaBoaHTTP(200,"Token validado! ");
+			//$this -> RespostaBoaHTTP( 200, ($this -> tokenPayload) );
 		}
 
 	}
@@ -50,34 +51,44 @@ class UsuariosController extends BaseController{
 				$this -> RespostaRuimHTTP(400,"Token não reconhecido! ".$th->getMessage(),"Requisição Mal Feita",0);
 				exit;
 			}
-			$valid1 = hash_hmac('sha256',"$header.$payload",$this -> SenhaToken,true);
+			$valid1 = hash_hmac('sha256',"$header.$payload",_SenhaToken,true);
 			$valid2 = base64_encode($valid1);
 			$valid3 = str_replace(['+', '/', '='], ['-', '_', ''], $valid2);
 			if($signature != $valid3){
-
-				$this -> RespostaRuimHTTP(400,"Token inválido!","Requisição Mal Feita",0);
+				
+				$this -> RespostaRuimHTTP(401,"Token inválido!","Não autorizado",0);
 				exit;
-
+				
 			}else{
 				
-				$this -> Model -> consultaUsuariosSession( session_id() );
+				$this -> token = $token;
+				$this -> tokenPayload = json_decode(base64_decode($payload));
+				$this -> Model -> consultaUsuarioId( $this -> getId() );
 				$result = $this -> Model -> getConsult();
+
 				if( $result == false ){
 					$_SESSION['usuarioSituacao'] = "erro";
 					sleep($_SESSION['usuarioErroEsperar']);
 
-					$this -> RespostaRuimHTTP(400,"Requer login! Sessão não autorizada!","Requisição Mal Feita",0);
-
+					$this -> RespostaRuimHTTP(401,"Token invalidado! Requer login!","Não autorizado",0);
+					
 					session_destroy();
 					exit;
 				}
+				
+				$this -> dados = $result -> fetch_assoc();
+				if( $this -> getTokenValidade() < (new DateTime) -> getTimestamp() ){
+					
+					$this -> RespostaRuimHTTP(401,"Token vencido! Requer login!","Não autorizado",0);
+
+				}
+
 			}
 			$lRetorno = true;
-			var_dump( base64_decode( $valid1 ) );
 		}else{
 			$_SESSION['usuarioSituacao'] = "erro";
 			sleep($_SESSION['usuarioErroEsperar']);
-			$this -> RespostaRuimHTTP(400,"Requer autorização HTTP!","Requisição Mal Feita",0);
+			$this -> RespostaRuimHTTP(401,"Requer autorização HTTP!","Não autorizado",0);
 			exit;
 		}
 		return $lRetorno;
@@ -92,7 +103,7 @@ class UsuariosController extends BaseController{
 			$_SESSION['usuarioSituacao'] = "erro";
 			sleep($_SESSION['usuarioErroEsperar']);
 			
-			$this -> RespostaRuimHTTP(400,"Requer login! Dados em branco!","Requisição Mal Feita",0);
+			$this -> RespostaRuimHTTP(400,"Dado em branco!","Requisição Mal Feita",0);
 			exit;
 		}
 
@@ -126,17 +137,18 @@ class UsuariosController extends BaseController{
 							'sub' => $linha["idPessoa"],
 							'jti' => 'lccr'.time().'dpl',
 							'iat' => time(),
-							'exp' => (new DateTime) -> add( new DateInterval('P45D') ) -> getTimestamp(),
+							'exp' => (new DateTime) -> add( new DateInterval('P2I') ) -> getTimestamp(),
 							'aud' => 'Luiz Carlos Costa Rodrigues - DATAPROL',
 							'iss' => 'monibus.tecnologia.ws',
 							'name' => $linha["nomePessoa"],
+							'user' => $linha["usuarioPessoa"],
 							'email' => $linha["emailPessoa"]
 							];
 				$payload = json_encode($payload);
 				$payload = base64_encode($payload);
 				$payload = str_replace(['+', '/', '='], ['-', '_', ''], $payload);
 
-				$signature = hash_hmac('sha256',"$header.$payload",$this -> SenhaToken,true);
+				$signature = hash_hmac('sha256',"$header.$payload",_SenhaToken,true);
 				$signature = base64_encode($signature);
 				$signature = str_replace(['+', '/', '='], ['-', '_', ''], $signature);
 
@@ -234,6 +246,42 @@ class UsuariosController extends BaseController{
 		}
 
     }
+
+	public function getId(){
+		return $this -> tokenPayload -> sub;
+	}
+
+	public function getNome(){
+		return $this -> tokenPayload -> name;
+	}
+
+	public function getIdentidade(){
+		return $this -> dados['identidadePessoa'];
+	}
+
+	public function getEmail(){
+		return $this -> tokenPayload -> email;
+	}
+
+	public function getTelefone(){
+		return $this -> dados['telefone1Pessoa'];
+	}
+
+	public function getTipo(){
+		return $this -> dados['tipoPessoa'];
+	}
+	
+	public function getUsuario(){
+		return $this -> tokenPayload -> user;
+	}
+	
+	public function getTokenValidade(){
+		return $this -> tokenPayload -> exp;
+	}
+
+	public function getToken(){
+		return $this -> token;
+	}
 
 }
 

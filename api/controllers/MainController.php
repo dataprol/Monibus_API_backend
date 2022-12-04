@@ -2,6 +2,8 @@
     
     class MainController{
 
+        var $Usuario;
+    
         public function Index(){
             require_once("controllers/UsuariosController.php");
             $this -> Usuario = new UsuariosController();

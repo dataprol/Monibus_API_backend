@@ -2,6 +2,9 @@
 //namespace Controlllers;
 final class LinhasController extends BaseController {
    
+    var $Model;
+    var $Usuario;
+
     function __construct(){
 		
 		require_once("models/LinhasModel.php");

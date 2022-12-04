@@ -1,7 +1,10 @@
 <?php
 //namespace Controlllers;
 final class ContratosController extends BaseController {
-   
+
+    var $Model;
+    var $Usuario;
+
     function __construct(){
 		
 		require_once("models/ContratosModel.php");

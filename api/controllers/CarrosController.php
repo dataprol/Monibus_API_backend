@@ -1,7 +1,10 @@
 <?php
 //namespace Controlllers;
 final class CarrosController extends BaseController {
-   
+
+    var $Model;
+    var $Usuario;
+
     function __construct(){
 		
 		require_once("models/CarrosModel.php");

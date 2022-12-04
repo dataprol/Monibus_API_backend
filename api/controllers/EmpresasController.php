@@ -3,6 +3,7 @@
 final class EmpresasController extends BaseController {
    
     var $Model;
+    var $Usuario;
     
     function __construct(){
 		

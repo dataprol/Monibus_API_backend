@@ -52,7 +52,7 @@ class BaseController{
     public function RespostaRuimHTTP($nCodigoHTTP,$cMensagem,$cNome,$nCodigo){
         
         $data['name'] = $cNome;
-        $data['menssage'] = $cMensagem;
+        $data['message'] = $cMensagem;
         $data['code'] = $nCodigo;
         $data['status'] = $nCodigoHTTP;
         $retornoHASH['success'] = "false";

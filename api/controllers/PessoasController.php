@@ -9,6 +9,7 @@ final class PessoasController extends BaseController {
     
     var $Mail;
     var $Model;
+    var $Usuario;
 
     function __construct(){
 		
@@ -74,6 +75,7 @@ final class PessoasController extends BaseController {
         if( !isset($ObjPessoa -> tipoPessoa) ){
             $ObjPessoa -> tipoPessoa = "";
         }
+        $aPessoa["senhaPessoa"] = isset($ObjPessoa -> senhaPessoa) ? $ObjPessoa -> senhaPessoa : null;
         $aPessoa["tipoPessoa"] = $ObjPessoa -> tipoPessoa;
         $aPessoa["telefone1Pessoa"] = isset($ObjPessoa -> telefone1Pessoa) ? $ObjPessoa -> telefone1Pessoa : null;
         $aPessoa["dataNascimentoPessoa"] = isset($ObjPessoa -> dataNascimentoPessoa) ? $ObjPessoa -> dataNascimentoPessoa : null;
@@ -88,10 +90,17 @@ final class PessoasController extends BaseController {
         $aPessoa["enderecoGIAPessoa"] = isset($ObjPessoa -> enderecoGIAPessoa) ? $ObjPessoa -> enderecoGIAPessoa : null;
 
         if($lRetorno){
-
             // Gera nova senha provisória e cadastra o usuário
-            $senhaDescripto = $this -> gerar_senha( 6, true, true, true, true );
-            $aPessoa["senhaPessoa"] = md5( $senhaDescripto );
+            $cTxtSenhaProvisoria = '';
+            if($aPessoa["senhaPessoa"] == null){
+                $senhaDescripto = $this -> gerar_senha( 6, true, true, true, true );
+                $aPessoa["senhaPessoa"] = md5( $senhaDescripto );
+                $cTxtSenhaProvisoria = 'Senha provisória: <b>' . $senhaDescripto . '</b><br>
+                        <br>
+                        <b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>';
+            }
+
+            // Ajusta campo nome
             $aPessoa["nomePessoa"] = mb_convert_case( $aPessoa["nomePessoa"],  MB_CASE_TITLE, 'UTF-8' );
 
             $this -> Model -> InsertPessoa($aPessoa);
@@ -122,9 +131,7 @@ final class PessoasController extends BaseController {
                         <h3>Seu cadastro foi concluído, com sucesso!</h3>
                         <p>Nome: ' . $aPessoa["nomePessoa"] . '<br>
                         Usuário: <b>' . $aPessoa["usuarioPessoa"] . '</b><br>
-                        Senha provisória: <b>' . $senhaDescripto . '</b><br>
-                        <br>
-                        <b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>
+                        '.$cTxtSenhaProvisoria.'
                         </p>
                         <br><br>
                         Equipe Monibus
