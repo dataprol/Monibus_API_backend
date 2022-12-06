@@ -61,4 +61,49 @@ class UsuariosModel{
         
     }
 
+    public function InsertUsuario($arrayUsers){
+
+        $sql = "INSERT INTO pessoas(
+                `nomePessoa`,
+                `identidadePessoa`,
+                `emailPessoa`,
+                `tipoPessoa`,
+                `usuarioPessoa`,
+                `senhaPessoa`,
+                `dataNascimentoPessoa`,
+                `telefone1Pessoa`,
+                `enderecoLogradouroPessoa`,
+                `enderecoNumeroPessoa`,
+                `enderecoBairroPessoa`,
+                `enderecoMunicipioPessoa`,
+                `enderecoUFPessoa`,
+                `enderecoCEPPessoa`,
+                `enderecoIBGEPessoa`,
+                `enderecoSIAFIPessoa`,
+                `enderecoGIAPessoa` ) 
+                VALUE(
+                    '" . $arrayUsers["nomePessoa"] . "', 
+                    '" . $arrayUsers['identidadePessoa'] . "', 
+                    '" . $arrayUsers['emailPessoa'] . "', 
+                    '" . $arrayUsers['tipoPessoa'] . "', 
+                    '" . $arrayUsers['usuarioPessoa'] . "', 
+                    '" . $arrayUsers['senhaPessoa'] . "', 
+                    '" . $arrayUsers['dataNascimentoPessoa'] . "',
+                    '" . $arrayUsers['telefone1Pessoa'] . "', 
+                    '" . $arrayUsers['enderecoLogradouroPessoa'] . "', 
+                    '" . $arrayUsers['enderecoNumeroPessoa'] . "', 
+                    '" . $arrayUsers['enderecoBairroPessoa'] . "', 
+                    '" . $arrayUsers['enderecoMunicipioPessoa'] . "', 
+                    '" . $arrayUsers['enderecoUFPessoa'] . "', 
+                    '" . $arrayUsers['enderecoCEPPessoa'] . "', 
+                    '" . $arrayUsers['enderecoIBGEPessoa'] . "', 
+                    '" . $arrayUsers['enderecoSIAFIPessoa'] . "', 
+                    '" . $arrayUsers['enderecoGIAPessoa'] . "'
+                    );";
+
+        $this -> Conn -> query($sql);
+        $this -> resultado = $this -> Conn -> insert_id;
+
+    }
+
 }

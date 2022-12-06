@@ -143,7 +143,6 @@ final class PessoasController extends BaseController {
                 
                 $this -> Mail -> setLanguage('br'); 
                 $this -> Mail -> CharSet='UTF-8'; 
-                //$this -> Mail -> SMTPDebug = SMTP::DEBUG_SERVER; 
                 $this -> Mail -> isSMTP(); 
                 $this -> Mail -> Host = _SisConfigGeral["email_servidor"]["hostname"]; 
                 $this -> Mail -> SMTPAuth = true; 
@@ -156,8 +155,6 @@ final class PessoasController extends BaseController {
                 $this -> Mail -> addAddress($cMailDestino, $cMailNomeDestino); 
                 $this -> Mail -> addAddress($cMailResposta); 
                 $this -> Mail -> addReplyTo($cMailOrigem, $cMailNomeResposta);
-                //$this -> Mail -> addCC('cc@exemplo.com');
-                //$this -> Mail -> addBCC('bcc@exemplo.com');
                 $this -> Mail -> isHTML(true); 
                 $this -> Mail -> Subject = $cMailAssunto;
                 $this -> Mail -> Body    = $cMailmensagem;

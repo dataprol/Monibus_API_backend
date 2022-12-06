@@ -72,6 +72,7 @@
                         case 'index': $User -> Index(); break;
                         case 'vlogin': $User -> ValidateLogin(); break;
                         case 'vtoken': $User -> ValidateToken(); break;
+                        case 'cadastrar': $User -> InsertUsuario(); break;
 						default:
 						break;
 					}
