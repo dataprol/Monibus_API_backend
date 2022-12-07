@@ -73,7 +73,7 @@ final class PessoasController extends BaseController {
         
         // Campos opcionais        
         if( !isset($ObjPessoa -> tipoPessoa) ){
-            $ObjPessoa -> tipoPessoa = "";
+            $ObjPessoa -> tipoPessoa = "P";
         }
         $aPessoa["senhaPessoa"] = isset($ObjPessoa -> senhaPessoa) ? $ObjPessoa -> senhaPessoa : null;
         $aPessoa["tipoPessoa"] = $ObjPessoa -> tipoPessoa;
@@ -274,16 +274,28 @@ final class PessoasController extends BaseController {
 
     public function UpdatePessoa( $idPessoa ){
 
+        $lRetorno = true;
 		$ObjPessoa = json_decode(file_get_contents("php://input"));
         
 		if( empty( $idPessoa ) ){
 			$idPessoa = $ObjPessoa -> idPessoa;
 		}
-        
-        if( !empty($idPessoa)){
+
+        if( !empty($idPessoa) && !empty($ObjPessoa) ){
+            
+            isset($ObjPessoa -> nomePessoa) ? $aPessoa["nomePessoa"] = $ObjPessoa -> nomePessoa : $lRetorno = false;
+            isset($ObjPessoa -> identidadePessoa) ? $aPessoa["identidadePessoa"] = $ObjPessoa -> identidadePessoa : $lRetorno = false;
+            isset($ObjPessoa -> emailPessoa) ? $aPessoa["emailPessoa"] = $ObjPessoa -> emailPessoa : $lRetorno = false;
+            
+            // Campos opcionais        
+            if( !isset($ObjPessoa -> tipoPessoa) ){
+                $ObjPessoa -> tipoPessoa = "P";
+            }
+            if( !isset($ObjPessoa -> presencaPessoa) ){
+                $ObjPessoa -> presencaPessoa = '0';
+            }
+
             $aPessoa["idPessoa"] = $idPessoa;
-            $aPessoa["nomePessoa"] = $ObjPessoa -> nomePessoa;
-            $aPessoa["emailPessoa"] = $ObjPessoa -> emailPessoa;
             $aPessoa["tipoPessoa"] = $ObjPessoa -> tipoPessoa;
             $aPessoa["telefone1Pessoa"] = $ObjPessoa -> telefone1Pessoa;
             $aPessoa["dataNascimentoPessoa"] = $ObjPessoa -> dataNascimentoPessoa;
@@ -297,13 +309,21 @@ final class PessoasController extends BaseController {
             $aPessoa["enderecoSIAFIPessoa"] = $ObjPessoa -> enderecoSIAFIPessoa;
             $aPessoa["enderecoGIAPessoa"] = $ObjPessoa -> enderecoGIAPessoa;
             $aPessoa["presencaPessoa"] = $ObjPessoa -> presencaPessoa;
-            $this -> Model -> UpdatePessoa($aPessoa);
-            $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
-            header('Content-Type: application/json');
-            echo json_encode($retorno);
-            http_response_code(200);
+
+            if( $lRetorno ){
+
+                $this -> Model -> UpdatePessoa($aPessoa);
+                $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
+                header('Content-Type: application/json');
+                echo json_encode($retorno);
+                http_response_code(200);
+
+            }
+            
         }else{
+
             $this -> RespostaRuimHTTP(400,"Requisição mal feita! Revisar a sintaxe!","Requisição Mal Feita",0);
+
         }
         
     }

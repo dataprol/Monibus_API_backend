@@ -44,7 +44,7 @@
     
     $aTiposCliente = array
     ( 
-    "Proprietário",
+    "Dono",
     "Administrador",
     "Monitor",
     "Cliente",

@@ -70,7 +70,8 @@ final class PessoasModel{
                 `enderecoCEPPessoa`,
                 `enderecoIBGEPessoa`,
                 `enderecoSIAFIPessoa`,
-                `enderecoGIAPessoa` ) 
+                `enderecoGIAPessoa`, 
+                `presencaPessoa` ) 
                 VALUE(
                     '" . $arrayPessoa["nomePessoa"] . "', 
                     '" . $arrayPessoa['identidadePessoa'] . "', 
@@ -88,11 +89,15 @@ final class PessoasModel{
                     '" . $arrayPessoa['enderecoCEPPessoa'] . "', 
                     '" . $arrayPessoa['enderecoIBGEPessoa'] . "', 
                     '" . $arrayPessoa['enderecoSIAFIPessoa'] . "', 
-                    '" . $arrayPessoa['enderecoGIAPessoa'] . "'
+                    '" . $arrayPessoa['enderecoGIAPessoa'] . "',
+                    '" . $arrayPessoa['presencaPessoa'] . "'
                     );";
 
         $this -> Conn -> query($sql);
         $this -> resultado = $this -> Conn -> insert_id;
+
+        echo $this -> Conn -> error.' / ';
+        echo $sql;
 
     }
 
@@ -112,9 +117,13 @@ final class PessoasModel{
                 ,enderecoIBGEPessoa='" . $arrayPessoa['enderecoIBGEPessoa'] . "' 
                 ,enderecoSIAFIPessoa='" . $arrayPessoa['enderecoSIAFIPessoa'] . "' 
                 ,enderecoGIAPessoa='" . $arrayPessoa['enderecoGIAPessoa'] . "' 
+                ,presencaPessoa='" . $arrayPessoa['presencaPessoa'] . "' 
             WHERE idPessoa=" . $arrayPessoa['idPessoa'] . ";" ;
 
         $this -> resultado = $this -> Conn -> query($sql);
+        
+        echo $this -> Conn -> error.' / ';
+        echo $sql;
 
     }
 
@@ -123,6 +132,9 @@ final class PessoasModel{
         $sql = "DELETE FROM pessoas WHERE idPessoa='" . $id . "';" ;
 
         $this -> resultado = $this -> Conn-> query($sql);
+
+        echo $this -> Conn -> error.' / ';
+        echo $sql;
 
     }
 
