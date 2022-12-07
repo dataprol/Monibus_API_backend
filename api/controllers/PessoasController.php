@@ -88,6 +88,7 @@ final class PessoasController extends BaseController {
         $aPessoa["enderecoIBGEPessoa"] = isset($ObjPessoa -> enderecoIBGEPessoa) ? $ObjPessoa -> enderecoIBGEPessoa : null;
         $aPessoa["enderecoSIAFIPessoa"] = isset($ObjPessoa -> enderecoSIAFIPessoa) ? $ObjPessoa -> enderecoSIAFIPessoa : null;
         $aPessoa["enderecoGIAPessoa"] = isset($ObjPessoa -> enderecoGIAPessoa) ? $ObjPessoa -> enderecoGIAPessoa : null;
+        $aPessoa["presencaPessoa"] = isset($ObjPessoa -> presencaPessoa) ? $ObjPessoa -> presencaPessoa : null;
 
         if($lRetorno){
             // Gera nova senha provisória e cadastra o usuário
@@ -284,6 +285,18 @@ final class PessoasController extends BaseController {
             $aPessoa["nomePessoa"] = $ObjPessoa -> nomePessoa;
             $aPessoa["emailPessoa"] = $ObjPessoa -> emailPessoa;
             $aPessoa["tipoPessoa"] = $ObjPessoa -> tipoPessoa;
+            $aPessoa["telefone1Pessoa"] = $ObjPessoa -> telefone1Pessoa;
+            $aPessoa["dataNascimentoPessoa"] = $ObjPessoa -> dataNascimentoPessoa;
+            $aPessoa["enderecoLogradouroPessoa"] = $ObjPessoa -> enderecoLogradouroPessoa;
+            $aPessoa["enderecoNumeroPessoa"] = $ObjPessoa -> enderecoNumeroPessoa;
+            $aPessoa["enderecoBairroPessoa"] = $ObjPessoa -> enderecoBairroPessoa;
+            $aPessoa["enderecoMunicipioPessoa"] = $ObjPessoa -> enderecoMunicipioPessoa;
+            $aPessoa["enderecoUFPessoa"] = $ObjPessoa -> enderecoUFPessoa;
+            $aPessoa["enderecoCEPPessoa"] = $ObjPessoa -> enderecoCEPPessoa;
+            $aPessoa["enderecoIBGEPessoa"] = $ObjPessoa -> enderecoIBGEPessoa;
+            $aPessoa["enderecoSIAFIPessoa"] = $ObjPessoa -> enderecoSIAFIPessoa;
+            $aPessoa["enderecoGIAPessoa"] = $ObjPessoa -> enderecoGIAPessoa;
+            $aPessoa["presencaPessoa"] = $ObjPessoa -> presencaPessoa;
             $this -> Model -> UpdatePessoa($aPessoa);
             $retorno['success'] = $this -> Model -> Conn -> affected_rows > 0 ? "true": "false";
             header('Content-Type: application/json');

@@ -102,7 +102,16 @@ final class PessoasModel{
             SET nomePessoa='" . $arrayPessoa['nomePessoa'] . "'
                 ,emailPessoa='" . $arrayPessoa['emailPessoa'] . "'
                 ,identidadePessoa='" . $arrayPessoa['identidadePessoa'] . "'
-                ,tipoPessoa='" . $arrayPessoa['tipoPessoa'] . "' 
+                ,dataNascimentoPessoa='" . $arrayPessoa['dataNascimentoPessoa'] . "' 
+                ,telefone1Pessoa='" . $arrayPessoa['telefone1Pessoa'] . "' 
+                ,enderecoLogradouroPessoa='" . $arrayPessoa['enderecoLogradouroPessoa'] . "' 
+                ,enderecoNumeroPessoa='" . $arrayPessoa['enderecoNumeroPessoa'] . "' 
+                ,enderecoBairroPessoa='" . $arrayPessoa['enderecoBairroPessoa'] . "' 
+                ,enderecoMunicipioPessoa='" . $arrayPessoa['enderecoMunicipioPessoa'] . "' 
+                ,enderecoCEPPessoa='" . $arrayPessoa['enderecoCEPPessoa'] . "' 
+                ,enderecoIBGEPessoa='" . $arrayPessoa['enderecoIBGEPessoa'] . "' 
+                ,enderecoSIAFIPessoa='" . $arrayPessoa['enderecoSIAFIPessoa'] . "' 
+                ,enderecoGIAPessoa='" . $arrayPessoa['enderecoGIAPessoa'] . "' 
             WHERE idPessoa=" . $arrayPessoa['idPessoa'] . ";" ;
 
         $this -> resultado = $this -> Conn -> query($sql);
