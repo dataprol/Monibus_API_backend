@@ -81,6 +81,7 @@ class UsuariosController extends BaseController{
 				}
 				
 				$this -> dados = $result -> fetch_assoc();
+
 				if( $this -> getTokenValidade() < (new DateTime) -> getTimestamp() ){
 					
 					$this -> RespostaRuimHTTP(401,"Token vencido! Requer login!","Não autorizado",0);
@@ -88,6 +89,16 @@ class UsuariosController extends BaseController{
 				}
 
 			}
+			$_SESSION['usuarioId'] = $this -> getId();
+			$_SESSION['usuarioLogin'] = $this -> getUsuario();
+			$_SESSION['usuarioTipo'] = $this -> getTipo();
+			$_SESSION['usuarioIdentidade'] = $this -> getIdentidade();
+			$_SESSION['usuarioNome'] = $this -> getNome();
+			$_SESSION['usuarioEmail'] = $this -> getEmail();
+			$_SESSION['usuarioTelefone'] = $this -> getTelefone();
+			$_SESSION['usuarioToken'] = $this -> getToken();
+			$_SESSION['usuarioTokenValidade'] = $this -> getTokenValidade();
+
 			$lRetorno = true;
 		}else{
 			$_SESSION['usuarioSituacao'] = "erro";
@@ -279,14 +290,13 @@ class UsuariosController extends BaseController{
 		return $this -> tokenPayload -> user;
 	}
 	
-	public function getTokenValidade(){
-		return $this -> tokenPayload -> exp;
-	}
-
 	public function getToken(){
 		return $this -> token;
 	}
 
+	public function getTokenValidade(){
+		return $this -> tokenPayload -> exp;
+	}
 
 	public function InsertUsuario(){
 		

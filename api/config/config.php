@@ -44,11 +44,8 @@
     
     $aTiposCliente = array
     ( 
-    "Dono",
     "Administrador",
     "Monitor",
-    "Cliente",
-    "Responsável",
     "Passageiro" 
     );
 

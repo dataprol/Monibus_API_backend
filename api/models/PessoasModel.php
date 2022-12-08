@@ -16,29 +16,58 @@ final class PessoasModel{
 
     public function CountRows($nIdRelacionamento){
         
-        $sql = "SELECT COUNT(*) as total_linhas FROM pessoas";
-        if( ! is_null($nIdRelacionamento) ){
-            $sql .= ", responsaveis_tem_dependentes";
-            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $nIdRelacionamento";
-            $sql .= " and pessoas.idPessoa = responsaveis_tem_dependentes.idDependente";
-        }
+        $sql = "SELECT COUNT(*) as total_linhas FROM pessoas as p";
+        
+        $sql .= $this -> FilterList($nIdRelacionamento);
+        
         $this -> resultado = $this -> Conn -> query( $sql );
 
     }
 
+    public function FilterList($nIdRelacionamento){
+        
+        $cUserTipo = $_SESSION['usuarioTipo'];
+        $cUserId = $_SESSION['usuarioId'];
+        $sql = "";
+
+        if( $cUserTipo == 'A' ){
+            // Seleciona empresas em que a pessoa é administradora ou monitora
+            $sqlEmpresaUsuario = "SELECT * FROM pessoas_tem_empresas";
+            $sqlEmpresaUsuario .= " WHERE idPessoa = $cUserId and tipoPessoa ='A'"; 
+            $aEmpresas = array();
+            $resultado = $this -> Conn -> query( $sqlEmpresaUsuario );
+            if( $resultado != false ){
+                if( $resultado -> num_rows > 0 ){ 
+                    while( $line = $resultado -> fetch_assoc() ) {
+                        array_push( $aEmpresas, $line );
+                    }
+                    $nIdRelacionamento = $aEmpresas[0]["idEmpresa"];
+                }
+            }
+            // filtra passageiros da empresa X
+            $sql .= " inner join pessoas_tem_empresas as ep";
+            $sql .= " on ep.idPessoa = p.idPessoa";
+            $sql .= " and ep.idEmpresa = $nIdRelacionamento" ;
+            $sql .= " and ep.tipoPessoa = 'P'";
+        //}else{
+            //$nIdRelacionamento = $cUserId;
+        }
+
+        return $sql;
+    }
+
     public function ListThis( $nComecarPor, $nItensPorPagina, $nIdRelacionamento ){
+
         
         $colunas = "*";
         $sql = "SELECT $colunas";
-        if( ! is_null($nIdRelacionamento) ){
-            $sql .= ", responsaveis_tem_dependentes";
-            $sql .= " WHERE responsaveis_tem_dependentes.idResponsavel = $nIdRelacionamento";
-            $sql .= " and pessoas.idPessoa = responsaveis_tem_dependentes.idDependente";
-        }
-        $sql .= " FROM pessoas";
+        $sql .= " FROM pessoas as p";
+        
+        $sql .= $this -> FilterList($nIdRelacionamento);
+
         $sql .= " ORDER BY dataCadastroPessoa DESC";
         $sql .= " LIMIT $nComecarPor, $nItensPorPagina";
-        
+
         $this -> resultado = $this -> Conn -> query( $sql );
 
     }
