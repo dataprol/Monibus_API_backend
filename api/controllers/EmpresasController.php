@@ -57,12 +57,10 @@ final class EmpresasController extends BaseController {
         if( ! isset($ObjEmpresa) ){
             $ObjEmpresa = json_decode( file_get_contents("php://input") );
         }
-        $aEmpresa["nomeEmpresa"] = isset($ObjEmpresa -> nomeEmpresa) ? $ObjEmpresa -> nomeEmpresa : $lRetorno = false;
-        $aEmpresa["identidadeEmpresa"] = isset($ObjEmpresa -> identidadeEmpresa) ? $ObjEmpresa -> identidadeEmpresa : $lRetorno = false;
-        $aEmpresa["emailEmpresa"] = isset($ObjEmpresa -> emailEmpresa) ? $ObjEmpresa -> emailEmpresa : $lRetorno = false;
-        $aEmpresa["telefoneEmpresa"] = isset($ObjEmpresa -> telefoneEmpresa) ? $ObjEmpresa -> telefoneEmpresa : null;
         $aEmpresa["idPessoa"] = isset($ObjEmpresa -> idPessoa) ? $ObjEmpresa -> idPessoa : $lRetorno = false;
         $aEmpresa["tipoPessoa"] = isset($ObjEmpresa -> tipoPessoa) ? $ObjEmpresa -> tipoPessoa : $lRetorno = false;
+        $aEmpresa["nomeEmpresa"] = isset($ObjEmpresa -> nomeEmpresa) ? $ObjEmpresa -> nomeEmpresa : $lRetorno = false;
+        $aEmpresa["identidadeEmpresa"] = isset($ObjEmpresa -> identidadeEmpresa) ? $ObjEmpresa -> identidadeEmpresa : $lRetorno = false;
 
         if($lRetorno){
             

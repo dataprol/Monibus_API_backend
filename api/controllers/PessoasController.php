@@ -70,7 +70,7 @@ final class PessoasController extends BaseController {
         isset($ObjPessoa -> identidadePessoa) ? $aPessoa["identidadePessoa"] = $ObjPessoa -> identidadePessoa : $lRetorno = false;
         isset($ObjPessoa -> emailPessoa) ? $aPessoa["emailPessoa"] = $ObjPessoa -> emailPessoa : $lRetorno = false;
         isset($ObjPessoa -> usuarioPessoa) ? $aPessoa["usuarioPessoa"] = $ObjPessoa -> usuarioPessoa : $lRetorno = false;
-        
+
         // Campos opcionais        
         if( !isset($ObjPessoa -> tipoPessoa) ){
             $ObjPessoa -> tipoPessoa = "P";
@@ -91,15 +91,15 @@ final class PessoasController extends BaseController {
         $aPessoa["presencaPessoa"] = isset($ObjPessoa -> presencaPessoa) ? $ObjPessoa -> presencaPessoa : null;
 
         if($lRetorno){
-            // Gera nova senha provisória e cadastra o usuário
+            // Gera nova senha provisória e cadastra a pessoa
             $cTxtSenhaProvisoria = '';
             if($aPessoa["senhaPessoa"] == null){
-                $senhaDescripto = $this -> gerar_senha( 6, true, true, true, true );
-                $aPessoa["senhaPessoa"] = md5( $senhaDescripto );
-                $cTxtSenhaProvisoria = 'Senha provisória: <b>' . $senhaDescripto . '</b><br>
-                        <br>
-                        <b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>';
-            }
+                $aPessoa["senhaPessoa"] = $this -> gerar_senha( 6, true, true, true, true );
+                $cTxtSenhaProvisoria = 'Senha provisória: <b>' . $aPessoa["senhaPessoa"] . '</b><br><br>
+				<b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>';
+			}
+			// Criptografa a senha
+			$aPessoa["senhaPessoa"] = md5( $aPessoa["senhaPessoa"] );
 
             // Ajusta campo nome
             $aPessoa["nomePessoa"] = mb_convert_case( $aPessoa["nomePessoa"],  MB_CASE_TITLE, 'UTF-8' );
@@ -165,9 +165,9 @@ final class PessoasController extends BaseController {
                 {
                     // A mensagem não pode ser enviada   
                 }
-                
                 // Opcionalmente, cadastra empresa e a vincula à pessoa
                 $ObjEmpresa = $ObjPessoa -> empresa;
+var_dump($ObjEmpresa);
                 if( isset($ObjEmpresa) ){
                     
                     require_once("controllers/EmpresasController.php");
@@ -346,5 +346,3 @@ final class PessoasController extends BaseController {
     }
 
 }
-
-?>

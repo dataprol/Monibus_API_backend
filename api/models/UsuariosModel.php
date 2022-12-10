@@ -106,4 +106,34 @@ class UsuariosModel{
 
     }
 
+    public function InsertEmpresaUsuario($arrayempresas){
+        
+        $sql = "INSERT INTO empresas( `nomeEmpresa`
+                                    ,`identidadeEmpresa`) 
+                VALUE('" . $arrayempresas['nomeEmpresa'] . "'
+                    ,'" . $arrayempresas['identidadeEmpresa'] . "'
+                    );";
+                    
+        $this -> Conn -> query($sql);
+        $idEmpresa = $this -> Conn -> insert_id;
+        
+        if( $idEmpresa > 0 ){
+            
+            $sql = "INSERT INTO pessoas_tem_empresas( `idEmpresa`
+                                        ,`idPessoa`
+                                        ,`tipoPessoa`
+                                        ) 
+                    VALUE(" . $idEmpresa . "
+                        ," . $arrayempresas['idPessoa'] . "
+                        ,'" . $arrayempresas['tipoPessoa'] . "'
+                        );";
+
+            if( ! $this -> Conn -> query($sql) ){
+                //$this -> resultado = 0;
+            }
+
+        }
+
+    }
+
 }

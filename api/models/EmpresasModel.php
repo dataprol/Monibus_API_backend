@@ -53,13 +53,9 @@ final class EmpresasModel{
     public function InsertEmpresa($arrayempresas){
         
         $sql = "INSERT INTO empresas( `nomeEmpresa`
-                                    ,`identidadeEmpresa`
-                                    ,`emailEmpresa`
-                                    ,`telefoneEmpresa`) 
+                                    ,`identidadeEmpresa`) 
                 VALUE('" . $arrayempresas['nomeEmpresa'] . "'
                     ,'" . $arrayempresas['identidadeEmpresa'] . "'
-                    ,'" . $arrayempresas['emailEmpresa'] . "'
-                    ,'" . $arrayempresas['telefoneEmpresa'] . "'
                     );";
                     
         $this -> Conn -> query($sql);

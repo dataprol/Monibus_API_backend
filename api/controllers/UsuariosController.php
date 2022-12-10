@@ -10,11 +10,17 @@ class UsuariosController extends BaseController{
 	var $token;
 	var $tokenPayload;
 	var $dados;
+	var $Mail;
 
 	function __construct(){
 
         require_once("models/UsuariosModel.php");
         $this -> Model = new UsuariosModel();
+
+        require_once('Utils/PHPMailer/src/Exception.php');
+        require_once('Utils/PHPMailer/src/SMTP.php');
+        require_once('Utils/PHPMailer/src/PHPMailer.php');
+        $this -> Mail = new PHPMailer;
 
 	}
 
@@ -329,12 +335,12 @@ class UsuariosController extends BaseController{
             // Gera nova senha provisória e cadastra o usuário
             $cTxtSenhaProvisoria = '';
             if($aPessoa["senhaPessoa"] == null){
-                $senhaDescripto = $this -> gerar_senha( 6, true, true, true, true );
-                $aPessoa["senhaPessoa"] = md5( $senhaDescripto );
-                $cTxtSenhaProvisoria = 'Senha provisória: <b>' . $senhaDescripto . '</b><br>
-                        <br>
-                        <b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>';
-            }
+                $aPessoa["senhaPessoa"] = $this -> gerar_senha( 6, true, true, true, true );
+                $cTxtSenhaProvisoria = 'Senha provisória: <b>' . $aPessoa["senhaPessoa"] . '</b><br><br>
+				<b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>';
+			}
+			// Criptografa a senha
+			$aPessoa["senhaPessoa"] = md5( $aPessoa["senhaPessoa"] );
 
             // Ajusta campo nome
             $aPessoa["nomePessoa"] = mb_convert_case( $aPessoa["nomePessoa"],  MB_CASE_TITLE, 'UTF-8' );
@@ -343,6 +349,28 @@ class UsuariosController extends BaseController{
             $idPessoa = $this -> Model -> GetConsult();
             
             if( $idPessoa > 0 ){
+
+                // Opcionalmente, cadastra empresa e a vincula à pessoa
+                $ObjEmpresa = $ObjPessoa -> empresa;
+                if( isset($ObjEmpresa) ){
+					
+                    $ObjEmpresa -> idPessoa = $idPessoa;
+                    $ObjEmpresa -> tipoPessoa = $aPessoa["tipoPessoa"];                    
+					$aEmpresa["idPessoa"] = isset($ObjEmpresa -> idPessoa) ? $ObjEmpresa -> idPessoa : $lRetorno = false;
+					$aEmpresa["tipoPessoa"] = $ObjEmpresa -> tipoPessoa;
+					$aEmpresa["nomeEmpresa"] = isset($ObjEmpresa -> nomeEmpresa) ? $ObjEmpresa -> nomeEmpresa : $lRetorno = false;
+					$aEmpresa["identidadeEmpresa"] = isset($ObjEmpresa -> identidadeEmpresa) ? $ObjEmpresa -> identidadeEmpresa : $lRetorno = false;			
+
+					if($lRetorno){
+						$this -> Model -> InsertEmpresaUsuario($aEmpresa);
+					}else{
+
+						$this -> RespostaRuimHTTP(400,"Sintaxe incorreta da empresa!","Requisição Mal Feita",0);
+						exit;			
+						ob_clean();
+
+					}
+				}
 
                 // Envia mensagem por e-Mail confirmando o cadastro
                 $cMailCharSet = 'UTF-8';
@@ -402,19 +430,6 @@ class UsuariosController extends BaseController{
                     // A mensagem não pode ser enviada
                 }
                 
-                // Opcionalmente, cadastra empresa e a vincula à pessoa
-                $ObjEmpresa = $ObjPessoa -> empresa;
-                if( isset($ObjEmpresa) ){
-                    
-                    require_once("controllers/EmpresasController.php");
-                    $EmpresaController = new EmpresasController();
-                    $ObjEmpresa -> idPessoa = $idPessoa;
-                    $ObjEmpresa -> tipoPessoa = $aPessoa["tipoPessoa"];
-                    $idEmpresa = $EmpresaController -> InsertEmpresa($ObjEmpresa);
-                    ob_clean();
-
-                }
-
                 // Responde com resposta de sucesso
                 header('Content-Type: application/json');
                 $data['idPessoa'] = $idPessoa;

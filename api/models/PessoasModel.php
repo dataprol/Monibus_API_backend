@@ -25,7 +25,7 @@ final class PessoasModel{
     }
 
     public function FilterList($nIdRelacionamento){
-        
+
         $cUserTipo = $_SESSION['usuarioTipo'];
         $cUserId = $_SESSION['usuarioId'];
         $sql = "";
@@ -49,8 +49,8 @@ final class PessoasModel{
             $sql .= " on ep.idPessoa = p.idPessoa";
             $sql .= " and ep.idEmpresa = $nIdRelacionamento" ;
             $sql .= " and ep.tipoPessoa = 'P'";
-        //}else{
-            //$nIdRelacionamento = $cUserId;
+        }else{
+            $sql = " WHERE p.idPessoa = 0";
         }
 
         return $sql;

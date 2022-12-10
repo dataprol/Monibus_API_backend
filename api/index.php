@@ -318,7 +318,7 @@
 			}
 		}
 
-	} catch (\Throwable $th) {
+	} catch ( Exception $th) {
 
 		$data['name'] = 'Erro do Servidor';
         $data['message'] = 'O servidor encontrou um problema inesperado.';
@@ -331,10 +331,8 @@
         if($retornoJSON){
             echo $retornoJSON;
         }else{
-            echo '{"message":"Erro na tentativa de conversão para JSON!","success":"false"}';
+            echo '{"message":"Erro na tentativa de conversão para JSON! '.$th.'","success":"false"}';
         }
         http_response_code( 500 );
 
 	}
-
-?>
