@@ -14,37 +14,34 @@ class UsuariosModel{
 
     }
 
-    public function consultaUsuario( $username ){
+    public function consultaUsuario( $userName ){
 
-        $sql = "SELECT * FROM pessoas 
-                WHERE usuarioPessoa='$username'";
+        $sql = "SELECT * FROM pessoas as p WHERE usuarioPessoa = '$userName' ";
         $this -> resultado = $this -> Conn -> query( $sql );
 
     }
     
+    public function consultaUsuarioEmpresas( $userName ){
+
+        // Seleciona empresas em que o usuário é administrador ou monitor
+        $sql = "SELECT * FROM pessoas_tem_empresas as etp 
+            inner join pessoas as p 
+                on etp.idPessoa = p.idPessoa and p.usuarioPessoa = '$userName' 
+            inner join empresas as e 
+                on e.idEmpresa = etp.idEmpresa 
+            where etp.tipoPessoa = 'A' ";
+
+        $this -> resultado = $this -> Conn -> query( $sql );
+    }
+    
     public function consultaUsuarioId( $userId ){
 
-        $sql = "SELECT * FROM pessoas 
+        $sql = "SELECT * FROM pessoas as p
                 WHERE idPessoa='$userId'";
         $this -> resultado = $this -> Conn -> query( $sql );
 
     }
     
-    public function consultaUsuariosSession( $sessionId ){
-        
-        $sql = "SELECT * FROM pessoas 
-                WHERE sessaoPessoa='$sessionId'";
-        $this -> resultado = $this -> Conn -> query( $sql );
-
-    }
-
-    public function AtualizarUsuario( $arrayUsuarios ){
-        $sql = "UPDATE pessoas 
-                SET sessaoPessoa='" . $arrayUsuarios["sessaoPessoa"] . "'
-                WHERE idPessoa=" . $arrayUsuarios["idPessoa"];
-        $this -> resultado = $this -> Conn -> query($sql);
-    }
-
     public function getConsult(){
 
         return $this -> resultado;
@@ -56,7 +53,6 @@ class UsuariosModel{
         $sql = "UPDATE pessoas 
                 SET senhaPessoa='" . md5( $arrayUsers['senhaPessoa'] ) . "', 
                 WHERE idPessoa=" . $arrayUsers['idPessoa'] ;
-                //senhaValidadePessoa='" . $arrayUsers['senhaValidadePessoa'] . "' 
         $this -> resultado = $this -> Conn -> query($sql);
         
     }
@@ -136,4 +132,58 @@ class UsuariosModel{
 
     }
 
+    public function SalvarIdRecuperacaoAcessoUsuario( $id, $idRecuperacaoAcesso ){
+
+        $sql = "UPDATE pessoas 
+                SET idRecuperacaoAcesso=$idRecuperacaoAcesso, validadeRecuperacaoAcesso=
+                ".
+                (new DateTime) -> add( new DateInterval('P1D') ) -> getTimestamp()
+                ." 
+                WHERE idPessoa=$id" ;
+                
+        $this -> resultado = $this -> Conn -> query($sql);
+        
+    }
+
+    public function ConsultaUsuarioEmail( $email ){
+
+        $sql = "SELECT * FROM pessoas as p
+                WHERE emailPessoa='$email'";
+
+        $this -> resultado = $this -> Conn -> query( $sql );
+
+    }
+
+/*     public function FilterList($else_sql_where){
+
+        $cUserTipo = $_SESSION['usuarioTipo'];
+        $cUserId = $_SESSION['usuarioId'];
+        $sql = "";
+
+        if( $cUserTipo == 'A' ){
+            // Seleciona empresas em que o usuário é administrador ou monitor
+            $sqlEmpresaUsuario = "SELECT * FROM pessoas_tem_empresas";
+            $sqlEmpresaUsuario .= " WHERE idPessoa = $cUserId and tipoPessoa ='A'"; 
+            $aEmpresas = array();
+            $resultado = $this -> Conn -> query( $sqlEmpresaUsuario );
+            if( $resultado != false ){
+                if( $resultado -> num_rows > 0 ){ 
+                    while( $line = $resultado -> fetch_assoc() ) {
+                        array_push( $aEmpresas, $line );
+                    }
+                    $nIdEmpresa = $aEmpresas[0]["idEmpresa"];
+                }
+            }
+            // filtra passageiros da empresa X
+            $sql .= " inner join pessoas_tem_empresas as ep";
+            $sql .= " on ep.idPessoa = p.idPessoa";
+            $sql .= " and ep.idEmpresa = $nIdEmpresa" ;
+            $sql .= " and ep.tipoPessoa = 'P'";
+        }else{
+            $sql = $else_sql_where;
+        }
+
+        return $sql;
+    }
+ */
 }

@@ -78,7 +78,10 @@ final class EmpresasModel{
             }
 
         }
-
+        
+        echo $this -> Conn -> error.' / ';
+        echo $sql;
+        
     }
 
     public function UpdateEmpresa($arrayempresas){

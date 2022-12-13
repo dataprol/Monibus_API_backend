@@ -81,8 +81,7 @@ class UsuariosController extends BaseController{
 					sleep($_SESSION['usuarioErroEsperar']);
 
 					$this -> RespostaRuimHTTP(401,"Token invalidado! Requer login!","Não autorizado",0);
-					
-					session_destroy();
+
 					exit;
 				}
 				
@@ -131,15 +130,24 @@ class UsuariosController extends BaseController{
 		$username = trim( strtolower( $ModelInfo -> username ) );
 		$password = trim( $ModelInfo -> password );
 
-		$this -> Model -> consultaUsuario( $username );
+		$this -> Model -> consultaUsuarioEmpresas( $username );
 		$result = $this -> Model -> getConsult();
+        if( $result != false ){
+			$aLinhas = array();
+            if( $result -> num_rows > 1 ){ 
+                while( $line = $result -> fetch_assoc() ) {
+                    array_push( $aLinhas, $line );  // usa as várias linhas retornadas
+                }
+				$cUsuario = $aLinhas[0];  // usa só a primeira linha retornada
+            }else{
+				$cUsuario = $result -> fetch_assoc();
+			}
 
-		if( $linha = $result -> fetch_assoc() ){
-			if( $linha[ 'senhaPessoa' ] == md5($password) ){
+			if( $cUsuario[ 'senhaPessoa' ] == md5($password) ){
 
-				$_SESSION["idPessoa"] 			= $linha["idPessoa"];
-				$_SESSION['nomePessoa'] 		= $linha['nomePessoa'];
-				$_SESSION['usuarioLogin'] 		= $linha['usuarioPessoa'];
+				$_SESSION["idPessoa"] 			= $cUsuario["idPessoa"];
+				$_SESSION['nomePessoa'] 		= $cUsuario['nomePessoa'];
+				$_SESSION['usuarioLogin'] 		= $cUsuario['usuarioPessoa'];
 				$_SESSION['usuarioSituacao'] 	= "loged";
 				
 				if( ! isset( $_SESSION[ "usuarioErroEsperar" ] ) ){
@@ -155,15 +163,15 @@ class UsuariosController extends BaseController{
 				$header = str_replace(['+', '/', '='], ['-', '_', ''], $header);
 
 				$payload = [
-							'sub' => $linha["idPessoa"],
+							'sub' => $cUsuario["idPessoa"],
 							'jti' => 'lccr'.time().'dpl',
 							'iat' => time(),
-							'exp' => (new DateTime) -> add( new DateInterval('P2D') ) -> getTimestamp(),
+							'exp' => (new DateTime) -> add( new DateInterval('P90D') ) -> getTimestamp(),
 							'aud' => 'Luiz Carlos Costa Rodrigues - DATAPROL',
 							'iss' => 'monibus.tecnologia.ws',
-							'name' => $linha["nomePessoa"],
-							'user' => $linha["usuarioPessoa"],
-							'email' => $linha["emailPessoa"]
+							'name' => $cUsuario["nomePessoa"],
+							'user' => $cUsuario["usuarioPessoa"],
+							'email' => $cUsuario["emailPessoa"]
 							];
 				$payload = json_encode($payload);
 				$payload = base64_encode($payload);
@@ -175,25 +183,46 @@ class UsuariosController extends BaseController{
 
 				$token = $header . "." . $payload . "." . $signature;
 
-				$linha['sessaoPessoa']=session_id();
-				$this -> Model -> AtualizarUsuario($linha);
-
+				$empresas = array();
+				if( $result -> num_rows > 1 ){
+					foreach ($aLinhas as $value) {
+						# code...
+						$emp["id"] = $value["idEmpresa"];
+						$emp["nome"] = $value["nomeEmpresa"];
+						$emp["identidade"] = $value["identidadeEmpresa"];
+						array_push($empresas,$emp);
+					}
+				}else{
+					$emp["id"] = $cUsuario["idEmpresa"];
+					$emp["nome"] = $cUsuario["nomeEmpresa"];
+					$emp["identidade"] = $cUsuario["identidadeEmpresa"];
+					array_push($empresas,$emp);
+				}
 				$retorno["token"] = $token;
+				$retorno["id"] = $cUsuario["idPessoa"];
+				$retorno["tipo"] = $cUsuario["tipoPessoa"];
+				$retorno["nome"] = $cUsuario["nomePessoa"];
+				$retorno["identidade"] = $cUsuario["identidadePessoa"];
+				$retorno["email"] = $cUsuario["emailPessoa"];
+				$retorno["telefone"] = $cUsuario["telefone1Pessoa"];
+				$retorno["empresa"] = $empresas;
+
 				$this -> RespostaBoaHTTP(200,$retorno);
 				exit;
 
 			}else{
 
-				$this -> VerificaQueErrou();	
+				$this -> RespostaRuimHTTP(400,"Usuário ou senha está errado!","Requisição Mal Feita",0);
 
 			}
+			
 		}
 
-		$this -> VerificaQueErrou();
+		$this -> RespostaRuimHTTP(500,"Algo deu errado na busca no banco de dados!","Erro Interno do Servidor",0);;
 
 	}
 
-	public function VerificaQueErrou(){
+	public function InformaQueDeuErro(){
 		
 		$msgErro = "Usuário ou senha está errado!";
 		$_SESSION['usuarioSituacao'] = "erro";
@@ -231,9 +260,9 @@ class UsuariosController extends BaseController{
 			$this -> Model -> consultaUsuario( $arrayPessoas["usuarioPessoa"] );
 			$result = $this -> Model -> getConsult();
 
-			if( $linha = $result -> fetch_assoc() ){
+			if( $cUsuario = $result -> fetch_assoc() ){
 
-				if( $linha[ 'senhaPessoa' ] == md5( $arrayPessoas["senhaPessoa"] ) ){
+				if( $cUsuario[ 'senhaPessoa' ] == md5( $arrayPessoas["senhaPessoa"] ) ){
 							
 					if( $arrayPessoas["senhaPessoa"] != $arrayPessoas["senhaNovaPessoa"] ){
 
@@ -335,7 +364,7 @@ class UsuariosController extends BaseController{
             // Gera nova senha provisória e cadastra o usuário
             $cTxtSenhaProvisoria = '';
             if($aPessoa["senhaPessoa"] == null){
-                $aPessoa["senhaPessoa"] = $this -> gerar_senha( 6, true, true, true, true );
+                $aPessoa["senhaPessoa"] = $this -> GerarSenha( 6, true, true, true, true );
                 $cTxtSenhaProvisoria = 'Senha provisória: <b>' . $aPessoa["senhaPessoa"] . '</b><br><br>
 				<b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>';
 			}
@@ -425,10 +454,11 @@ class UsuariosController extends BaseController{
                 $this -> Mail -> Body    = $cMailmensagem;
                 $this -> Mail -> AltBody = strip_tags( $cMailmensagem );
                 
-                if( ! $this -> Mail -> send() ) 
+                if( ! $this -> Mail -> send() )
                 {
                     // A mensagem não pode ser enviada
                 }
+				session_destroy();
                 
                 // Responde com resposta de sucesso
                 header('Content-Type: application/json');
@@ -488,8 +518,8 @@ class UsuariosController extends BaseController{
 
 	}
 
-	//Exemplo retirado do website DevMedia
-	function gerar_senha( $tamanho, $maiusculas, $minusculas, $numeros, $simbolos ){
+	// Exemplo retirado do website DevMedia
+	function GerarSenha( $tamanho, $maiusculas, $minusculas, $numeros, $simbolos ){
 
 		$senha = '';
 		$ma = "ABCDEFGHJKLMNPQRSTUVYXWZ"; // $ma contem as letras maiúsculas
@@ -519,6 +549,113 @@ class UsuariosController extends BaseController{
 	
 		// retorna a senha embaralhada com "str_shuffle" com o tamanho definido pela variável $tamanho
 		return mb_substr( str_shuffle( $senha ), 0, $tamanho );
+
+	}
+
+	function GetGUIDv4($data = null) {
+
+		// Generate 16 bytes (128 bits) of random data or use the data passed into the function.
+		$data = $data ?? random_bytes(16);
+		assert(strlen($data) == 16);
+	
+		// Set version to 0100
+		$data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+		
+		// Set bits 6-7 to 10
+		$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+	
+		// Output the 36 character UUID.
+		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+		
+	}
+	
+	function SolicitarRecuperarAcesso(){
+		
+		$ModelInfo = json_decode( file_get_contents("php://input") );
+		
+		if( empty( $ModelInfo ) || empty($ModelInfo -> email) ){ 
+			$this -> RespostaRuimHTTP(400,"Dado em branco!","Requisição Mal Feita",0);
+			exit;
+		}
+		
+		$email = trim( strtolower( $ModelInfo -> email ) );
+		
+		$this -> Model -> ConsultaUsuarioEmail( $email );
+		$result = $this -> Model -> getConsult();
+
+		if( $cUsuario = $result -> fetch_assoc() ){
+
+			$idRecuperacao = $this -> GetGUIDv4();
+			
+			$this -> Model -> SalvarIdRecuperacaoAcessoUsuario( $cUsuario["idPessoa"], $idRecuperacao );
+			if( $this -> Model -> getConsult() &&  $this -> Model -> Conn -> affected_rows > 0 ){
+
+                // Envia mensagem por e-Mail confirmando o cadastro
+                $cMailCharSet = 'UTF-8';
+                $cMailHeaders = '';
+                $cMailOrigem = 'sac@monibus.tecnologia.ws';
+                $cMailNomeOrigem = 'SAC Monibus';
+                $cMailResposta = 'sac@monibus.tecnologia.ws';
+                $cMailNomeResposta = 'SAC Monibus';
+                $cMailDestino = $cUsuario["emailPessoa"];
+                $cMailNomeDestino = ''; //$cUsuario["nomePessoa"];
+                $cMailAssunto = 'Recuperação de Acesso ao Monibus' ;
+                $cMailmensagem = '
+                <html lang="pt">
+                    <meta charset="' . mb_strtolower($cMailCharSet) . '">
+                    <meta name="author" content="Luiz Carlos Costa Rodrigues born in Santa Maria RS Brazil, www.dataprol.com.br">
+                    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no">
+                    <head>
+                        <title>Recuperação de Acesso Monibus</title>
+                    </head>
+                    <body>
+                        <h1>Recuperação de Acesso Monibus</h1>
+                        <h3>Para recuperar o acesso e alterar sua senha, use o link abaixo!</h3>
+                        Link: <a href="http://monibus.tecnologia.ws/recuperaracesso?idrecuperacao=' . $idRecuperacao . '">Recuperar Acesso</a><br>
+                        <br><br>
+                        Equipe Monibus
+                        <br>
+                        <a href="http://www.monibus.tecnologia.ws/">www.monibus.tecnologia.ws</a>
+                    </body>
+                </html>
+                ';
+                
+                $this -> Mail -> setLanguage('br'); 
+                $this -> Mail -> CharSet='UTF-8'; 
+                //$this -> Mail -> SMTPDebug = SMTP::DEBUG_SERVER; 
+                $this -> Mail -> isSMTP(); 
+                $this -> Mail -> Host = _SisConfigGeral["email_servidor"]["hostname"]; 
+                $this -> Mail -> SMTPAuth = true; 
+                $this -> Mail -> Username = _SisConfigGeral["email_servidor"]["username"]; 
+                $this -> Mail -> Password = _SisConfigGeral["email_servidor"]["password"]; 
+                $this -> Mail -> SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+                $this -> Mail -> Port = 587; 
+                $this -> Mail -> From = $cMailOrigem; 
+                $this -> Mail -> FromName = $cMailNomeOrigem; 
+                $this -> Mail -> addAddress($cMailDestino, $cMailNomeDestino); 
+                $this -> Mail -> addAddress($cMailResposta); 
+                $this -> Mail -> addReplyTo($cMailOrigem, $cMailNomeResposta);
+                $this -> Mail -> isHTML(true); 
+                $this -> Mail -> Subject = $cMailAssunto;
+                $this -> Mail -> Body    = $cMailmensagem;
+                $this -> Mail -> AltBody = strip_tags( $cMailmensagem );
+                
+                if( ! $this -> Mail -> send() )
+                {
+                    // A mensagem não pode ser enviada.
+                }
+				session_destroy();
+				
+				$this -> RespostaBoaHTTP(200,"Solicitação atendida com sucesso!");
+			
+			}else{
+
+				$this -> RespostaRuimHTTP(500,"A análise do usuário falhou!","Erro interno",0);
+				exit;
+
+			}
+
+		}
 
 	}
 	

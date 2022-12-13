@@ -69,12 +69,13 @@ final class PessoasController extends BaseController {
         isset($ObjPessoa -> nomePessoa) ? $aPessoa["nomePessoa"] = $ObjPessoa -> nomePessoa : $lRetorno = false;
         isset($ObjPessoa -> identidadePessoa) ? $aPessoa["identidadePessoa"] = $ObjPessoa -> identidadePessoa : $lRetorno = false;
         isset($ObjPessoa -> emailPessoa) ? $aPessoa["emailPessoa"] = $ObjPessoa -> emailPessoa : $lRetorno = false;
-        isset($ObjPessoa -> usuarioPessoa) ? $aPessoa["usuarioPessoa"] = $ObjPessoa -> usuarioPessoa : $lRetorno = false;
-
+        
         // Campos opcionais        
         if( !isset($ObjPessoa -> tipoPessoa) ){
             $ObjPessoa -> tipoPessoa = "P";
         }
+        
+        $aPessoa["usuarioPessoa"] = isset($ObjPessoa -> usuarioPessoa) ? $ObjPessoa -> usuarioPessoa : null;
         $aPessoa["senhaPessoa"] = isset($ObjPessoa -> senhaPessoa) ? $ObjPessoa -> senhaPessoa : null;
         $aPessoa["tipoPessoa"] = $ObjPessoa -> tipoPessoa;
         $aPessoa["telefone1Pessoa"] = isset($ObjPessoa -> telefone1Pessoa) ? $ObjPessoa -> telefone1Pessoa : null;
@@ -94,7 +95,7 @@ final class PessoasController extends BaseController {
             // Gera nova senha provisória e cadastra a pessoa
             $cTxtSenhaProvisoria = '';
             if($aPessoa["senhaPessoa"] == null){
-                $aPessoa["senhaPessoa"] = $this -> gerar_senha( 6, true, true, true, true );
+                $aPessoa["senhaPessoa"] = $this -> GerarSenha( 6, true, true, true, true );
                 $cTxtSenhaProvisoria = 'Senha provisória: <b>' . $aPessoa["senhaPessoa"] . '</b><br><br>
 				<b>Assim que acessar o sistema, solicitaremos que altere a senha.</b>';
 			}
@@ -108,6 +109,25 @@ final class PessoasController extends BaseController {
             $idPessoa = $this -> Model -> GetConsult();
             
             if( $idPessoa > 0 ){
+                
+                // Opcionalmente, cadastra empresa e a vincula à pessoa
+                $ObjEmpresa = $ObjPessoa -> empresa;
+                if( isset($ObjEmpresa) ){
+                    
+                    if( $ObjEmpresa -> idEmpresa > 0 ){
+                        $idEmpresa = $ObjEmpresa -> idEmpresa;
+                        $this -> Model -> VincularEmpresa($idEmpresa, $idPessoa, $aPessoa["tipoPessoa"]);
+                        $idPessoa = $this -> Model -> GetConsult();
+                    }else{
+                        require_once("controllers/EmpresasController.php");
+                        $EmpresaController = new EmpresasController();
+                        $ObjEmpresa -> idPessoa = $idPessoa;
+                        $ObjEmpresa -> tipoPessoa = $aPessoa["tipoPessoa"];
+                        $idEmpresa = $EmpresaController -> InsertEmpresa($ObjEmpresa);
+                    }
+                    ob_clean();
+                    
+                }
 
                 // Envia mensagem por e-Mail confirmando o cadastro
                 $cMailCharSet = 'UTF-8';
@@ -165,19 +185,7 @@ final class PessoasController extends BaseController {
                 {
                     // A mensagem não pode ser enviada   
                 }
-                // Opcionalmente, cadastra empresa e a vincula à pessoa
-                $ObjEmpresa = $ObjPessoa -> empresa;
-var_dump($ObjEmpresa);
-                if( isset($ObjEmpresa) ){
-                    
-                    require_once("controllers/EmpresasController.php");
-                    $EmpresaController = new EmpresasController();
-                    $ObjEmpresa -> idPessoa = $idPessoa;
-                    $ObjEmpresa -> tipoPessoa = $aPessoa["tipoPessoa"];
-                    $idEmpresa = $EmpresaController -> InsertEmpresa($ObjEmpresa);
-                    ob_clean();
-                    
-                }
+                session_destroy();
 
                 // Responde com resposta de sucesso
                 header('Content-Type: application/json');
@@ -239,7 +247,7 @@ var_dump($ObjEmpresa);
 
 
     //Exemplo retirado do website DevMedia
-    function gerar_senha( $tamanho, $maiusculas, $minusculas, $numeros, $simbolos ){
+    function GerarSenha( $tamanho, $maiusculas, $minusculas, $numeros, $simbolos ){
 
         $senha = '';
         $ma = "ABCDEFGHJKLMNPQRSTUVYXWZ"; // $ma contem as letras maiúsculas

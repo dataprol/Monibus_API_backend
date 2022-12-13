@@ -2,8 +2,6 @@
     
 	require_once("config/config.php");
 
-	session_start(); 
-	
 	require_once("controllers/BaseController.php");
 
 	if( ! isset( $_SESSION[ "usuarioErroEsperar" ] ) ){
@@ -75,12 +73,13 @@
 							case 'vlogin': $User -> ValidateLogin(); break;
 							case 'vtoken': $User -> ValidateToken(); break;
 							case 'cadastrar': $User -> InsertUsuario(); break;
+							case 'solicitarrecuperaracesso': $User -> SolicitarRecuperarAcesso(); break;
 							default:
 							break;
 						}
 					}
 				break;
-	
+
 				case 'pessoas':
 					
 					require_once( "controllers/PessoasController.php" );

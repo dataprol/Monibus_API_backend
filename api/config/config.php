@@ -1,11 +1,5 @@
 <?php
 
-	//session_cache_expire(21600); 	// 21600 minutos são 15 dias. 
-									// Cuidado! Dados ficarão gravados por todo esse tempo!
-                                    // Risco de sobrecarga e de falha de segurança!
-
-    // Configurações da instalação no servidor
-    //setlocale(LC_ALL , 'pt_BR');
     setlocale( LC_ALL, 'pt_BR', 'pt_BR.iso-8859-1', 'pt_BR.utf-8', 'portuguese' );
     date_default_timezone_set( 'America/Sao_Paulo' );
     
@@ -47,12 +41,6 @@
     "Administrador",
     "Monitor",
     "Passageiro" 
-    );
-
-    $sistemacobranca = array
-    ( 
-    'token' => '7aW5mH5-l144tm8u-944v-qghg-a1rira77',
-    'url'   => 'https://www.f2b.com.br/api/v1' 
     );
 
     // Cria as constantes do sistema

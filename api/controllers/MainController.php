@@ -20,7 +20,6 @@
         }
         
         public function DestroySession(){
-            session_destroy();
 			header('Content-Type: application/json');
 			echo('{ "Result": "sessão destruída!" }');
 			exit;

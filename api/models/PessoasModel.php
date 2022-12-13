@@ -187,6 +187,23 @@ final class PessoasModel{
 
     }
 
+    public function VincularEmpresa($idEmpresa,$idPessoa,$tipoPessoa){
+
+        $sql = "INSERT INTO pessoas_tem_empresas( `idEmpresa`
+                                    ,`idPessoa`
+                                    ,`tipoPessoa`
+                                    ) 
+                VALUE(" . $idEmpresa . "
+                    ," . $idPessoa . "
+                    ,'" . $tipoPessoa . "'
+                    );";
+
+        if( ! $this -> Conn -> query($sql) ){
+            $this -> resultado = 0;
+        }
+        
+    }
+
 }
 
 ?>

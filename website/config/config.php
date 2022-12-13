@@ -3,7 +3,6 @@
     setlocale( LC_ALL, 'pt_BR', 'pt_BR.iso-8859-1', 'pt_BR.utf-8', 'portuguese' );
     date_default_timezone_set( 'America/Sao_Paulo' );
 
-    // Configurações da instalação no servidor
     require_once('passwords.php');
 
     // Prazo para a sessão expirar:
@@ -60,24 +59,19 @@
 
     }
 
-    // Cria as constantes gerais do sistema
-    define( "_PROJETO_TITULO", "Prato Solidário" );
-    define( "_PROJETO_VERSAO", "0.1.5.1" );
-    define( "_PROJETO_AUTORIA", "Geraldo Samir Silveira Varriale e Luiz Carlos Costa Rodrigues" );
-    define( "_PROJETO_COPYRIGHT", "2021 - Geraldo Samir Silveira Varriale e Luiz Carlos Costa Rodrigues" );
-    define( "_PROJETO_WEBSITELINK", '<a href="https://lsp.provisorio.ws/">lsp.provisorio.ws</a>');
-    define( "_PROJETO_WEBSITEURL", 'https://lsp.provisorio.ws/');
+
+    // Cria as constantes do sistema
+    define( "_FMT_DATA", "%d/%m/%Y" );
     define( "_FMT_DATA_HORA", "%d/%m/%Y %Hh%M" );
-    define( "_TIPO_COMERCIO", 0 );
-    define( "_TIPO_ONG", 1 );
-    define( "_USUARIOS_LISTA_NIVEIS", array("Operacional"=>24,
-                                            "Técnico"=>49,
-                                            "Gerencial"=>74,
-                                            "Administrativo"=>99) );
-    define( "_TIPOS_DE_CADASTRO", array("Comércio","ONG") );
-    define( "_PEDIDOS_SITUACOES", array("Disponível"=>0,
-                                        "Reservada"=>1,
-                                        "Cancelada"=>8,
-                                        "Coletada"=>9) );
+    define( "_PaginacaoItensPorPagina", 5 );
+    define( "_SisConfigGeral", $sisConfig );
+
+    define( "_PROJETO_TITULO", "Monibus" );
+    define( "_PROJETO_VERSAO", "0.1.1.1" );
+    define( "_PROJETO_AUTORIA", "Luiz Carlos Costa Rodrigues" );
+    define( "_PROJETO_COPYRIGHT", "2022 - Luiz Carlos Costa Rodrigues" );
+    define( "_PROJETO_WEBSITELINK", '<a href="https://www.monibus.tecnologia.ws/">www.monibus.tecnologia.ws</a>');
+    define( "_PROJETO_WEBSITEURL", 'https://www.monibus.tecnologia.ws/');
+
 
 ?>
