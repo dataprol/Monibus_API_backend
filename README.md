@@ -3,7 +3,7 @@
 A web API project for school transport monitor person.
 
 ## About
-This project back-end API web is developed for my university graduation project.
+This project back-end API web is doing developed for my university graduation project.
 
 ## Licence
 

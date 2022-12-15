@@ -133,6 +133,7 @@ class UsuariosController extends BaseController{
 		$this -> Model -> consultaUsuarioEmpresas( $username );
 		$result = $this -> Model -> getConsult();
         if( $result != false ){
+
 			$aLinhas = array();
             if( $result -> num_rows > 1 ){ 
                 while( $line = $result -> fetch_assoc() ) {
@@ -198,7 +199,6 @@ class UsuariosController extends BaseController{
 					$emp["identidade"] = $cUsuario["identidadeEmpresa"];
 					array_push($empresas,$emp);
 				}
-				$retorno["token"] = $token;
 				$retorno["id"] = $cUsuario["idPessoa"];
 				$retorno["tipo"] = $cUsuario["tipoPessoa"];
 				$retorno["nome"] = $cUsuario["nomePessoa"];
@@ -206,6 +206,8 @@ class UsuariosController extends BaseController{
 				$retorno["email"] = $cUsuario["emailPessoa"];
 				$retorno["telefone"] = $cUsuario["telefone1Pessoa"];
 				$retorno["empresa"] = $empresas;
+				
+				$retorno["token"] = $token;
 
 				$this -> RespostaBoaHTTP(200,$retorno);
 				exit;
@@ -611,7 +613,7 @@ class UsuariosController extends BaseController{
                     <body>
                         <h1>Recuperação de Acesso Monibus</h1>
                         <h3>Para recuperar o acesso e alterar sua senha, use o link abaixo!</h3>
-                        Link: <a href="http://monibus.tecnologia.ws/recuperaracesso?idrecuperacao=' . $idRecuperacao . '">Recuperar Acesso</a><br>
+                        Link: <a href="http://monibus.tecnologia.ws/recuperaracesso.php?idrecuperacao=' . $idRecuperacao . '">Recuperar Acesso</a><br>
                         <br><br>
                         Equipe Monibus
                         <br>
@@ -642,8 +644,11 @@ class UsuariosController extends BaseController{
                 
                 if( ! $this -> Mail -> send() )
                 {
-                    // A mensagem não pode ser enviada.
-                }
+                    // A mensagem não pôde ser enviada.
+					$this -> RespostaRuimHTTP(500,"Falha no envio da sua solicitação!","Erro interno",0);
+					exit;
+
+				}
 				session_destroy();
 				
 				$this -> RespostaBoaHTTP(200,"Solicitação atendida com sucesso!");
@@ -654,6 +659,11 @@ class UsuariosController extends BaseController{
 				exit;
 
 			}
+
+		}else{
+
+			$this -> RespostaRuimHTTP(404,"Email não cadastrado!","Requisição Mal Feita",0);
+			exit;
 
 		}
 

@@ -17,6 +17,7 @@ class UsuariosModel{
     public function consultaUsuario( $userName ){
 
         $sql = "SELECT * FROM pessoas as p WHERE usuarioPessoa = '$userName' ";
+
         $this -> resultado = $this -> Conn -> query( $sql );
 
     }
@@ -29,15 +30,17 @@ class UsuariosModel{
                 on etp.idPessoa = p.idPessoa and p.usuarioPessoa = '$userName' 
             inner join empresas as e 
                 on e.idEmpresa = etp.idEmpresa 
-            where etp.tipoPessoa = 'A' ";
+            ";//where etp.tipoPessoa = 'A' ";
 
         $this -> resultado = $this -> Conn -> query( $sql );
+
     }
     
     public function consultaUsuarioId( $userId ){
 
         $sql = "SELECT * FROM pessoas as p
                 WHERE idPessoa='$userId'";
+
         $this -> resultado = $this -> Conn -> query( $sql );
 
     }
@@ -135,20 +138,24 @@ class UsuariosModel{
     public function SalvarIdRecuperacaoAcessoUsuario( $id, $idRecuperacaoAcesso ){
 
         $sql = "UPDATE pessoas 
-                SET idRecuperacaoAcesso=$idRecuperacaoAcesso, validadeRecuperacaoAcesso=
-                ".
-                (new DateTime) -> add( new DateInterval('P1D') ) -> getTimestamp()
-                ." 
-                WHERE idPessoa=$id" ;
+                SET idRecuperacaoAcesso = '$idRecuperacaoAcesso'
+                , validadeRecuperacaoAcesso = 
+                '".
+                (new DateTime) -> add( new DateInterval('PT10M') ) -> format('Y-m-d H:i:s')
+                ."' 
+                WHERE idPessoa = $id" ;
                 
         $this -> resultado = $this -> Conn -> query($sql);
         
+        echo $this -> Conn -> error.' / ';
+        echo $sql;
+
     }
 
     public function ConsultaUsuarioEmail( $email ){
 
         $sql = "SELECT * FROM pessoas as p
-                WHERE emailPessoa='$email'";
+                WHERE p.emailPessoa='$email'";
 
         $this -> resultado = $this -> Conn -> query( $sql );
 
