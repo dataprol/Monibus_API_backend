@@ -191,16 +191,17 @@ class UsuariosController extends BaseController{
 						$emp["id"] = $value["idEmpresa"];
 						$emp["nome"] = $value["nomeEmpresa"];
 						$emp["identidade"] = $value["identidadeEmpresa"];
+						$emp["tipo"] = $cUsuario["tipoPessoa"];
 						array_push($empresas,$emp);
 					}
 				}else{
 					$emp["id"] = $cUsuario["idEmpresa"];
 					$emp["nome"] = $cUsuario["nomeEmpresa"];
 					$emp["identidade"] = $cUsuario["identidadeEmpresa"];
+					$emp["tipo"] = $cUsuario["tipoPessoa"];
 					array_push($empresas,$emp);
 				}
 				$retorno["id"] = $cUsuario["idPessoa"];
-				$retorno["tipo"] = $cUsuario["tipoPessoa"];
 				$retorno["nome"] = $cUsuario["nomePessoa"];
 				$retorno["identidade"] = $cUsuario["identidadePessoa"];
 				$retorno["email"] = $cUsuario["emailPessoa"];

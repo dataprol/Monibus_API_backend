@@ -22,6 +22,15 @@ class UsuariosModel{
 
     }
     
+    public function consultaUsuarioId( $userId ){
+
+        $sql = "SELECT * FROM pessoas as p
+                WHERE idPessoa='$userId'";
+
+        $this -> resultado = $this -> Conn -> query( $sql );
+
+    }
+    
     public function consultaUsuarioEmpresas( $userName ){
 
         // Seleciona empresas em que o usuário é administrador ou monitor
@@ -30,16 +39,8 @@ class UsuariosModel{
                 on etp.idPessoa = p.idPessoa and p.usuarioPessoa = '$userName' 
             inner join empresas as e 
                 on e.idEmpresa = etp.idEmpresa 
+            order by etp.tipoPessoa 
             ";//where etp.tipoPessoa = 'A' ";
-
-        $this -> resultado = $this -> Conn -> query( $sql );
-
-    }
-    
-    public function consultaUsuarioId( $userId ){
-
-        $sql = "SELECT * FROM pessoas as p
-                WHERE idPessoa='$userId'";
 
         $this -> resultado = $this -> Conn -> query( $sql );
 
